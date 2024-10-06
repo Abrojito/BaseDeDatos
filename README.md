@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MovieWeb
 Este proyecto es parte del Trabajo Práctico 1 para la materia Bases de Datos y Recursos de Información - 2024. La aplicación web permite a los usuarios buscar películas, actores y directores, ver información detallada y explorar películas relacionadas a través de palabras clave.
 
@@ -45,3 +46,13 @@ El principal objetivo de este proyecto es adquirir experiencia en el desarrollo 
 BASE DE DATOS - 2024 
 
 
+=======
+# Base de Datos y Recursos de Información
+## TP - MovieWeb
+
+### Instalar dependencias
+`npm install express sqlite3 ejs`
+
+### Ejecutar
+`node app.js`
+>>>>>>> upstream/main
