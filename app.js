@@ -239,6 +239,19 @@ app.get('/director/:id', (req, res) => {
     });
 });
 
+// redigir a una pagina que muestre las peliculas de los actores
+app.get('/actor/:id', function(req,res) {
+    const actorId = req.params.id;
+    const sql = `
+        SELECT movies.title FROM movies 
+        JOIN movie_actor ON movies.id = movie_actors.movie_id
+        WHERE movie_actors.actor_id = ?`;
+    db.all(sql, [actorId], (err, movies) => {
+        if (err) return res.status(500).send(err.message);
+        res.render('actor.ejs', {movies});
+    });
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
