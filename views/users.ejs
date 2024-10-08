@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/users.css">
+    <title>Usuarios</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Seleccionar usuario</h1>
+        <div class="user-selection">
+            <% users.forEach((user)=> { %>
+                <div class="user-card">
+                    <img src="/images/xoaco.png" alt="<%= user.user_name %>" style="max-width: 150px;">
+                    <p>
+                        <%= user.user_name %>
+                    </p>
+                    <button class="add-user-btn"
+                        onclick="location.href='/user/edit?id=<%= user.user_id %>&username=<%= user.user_username %>&name=<%= user.user_name %>&email=<%= user.user_email %>'">Editar</button>
+                </div>
+                <% }) %>
+        </div>
+        <button id="add-button" class="add-user-btn" onclick="location.href='/user/add'">Agregar usuario</button>
+    </div>
+</body>
+
+</html>

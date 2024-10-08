@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/add-user.css">
+    <title>Editar Usuario</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Editar usuario</h1>
+        <form id="edit-form" class="add-user-form">
+            <div class="form-group">
+                <label for="name">Nombre de usuario</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit" class="submit-btn">Guardar</button>
+            <button id="delete-btn" class="submit-btn">Eliminar usuario</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById("edit-form")
+        const username = document.getElementById("username")
+        const name = document.getElementById("name")
+        const email = document.getElementById("email")
+        const urlParams = new URLSearchParams(window.location.search)
+        const id = urlParams.get("id")
+        const deleteBtn = document.getElementById("delete-btn")
+
+        window.onload = function () {
+            username.value = urlParams.get("username")
+            name.value = urlParams.get("name")
+            email.value = urlParams.get("email")
+        }
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault()
+
+            const body = {
+                username: username.value,
+                name: name.value,
+                email: email.value,
+            }
+
+            fetch(`/user/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body),
+            })
+                .then((response) => response.text().then((result) => {
+                    alert(result)
+                    location.href = "/user"
+                }))
+                .catch((error) => alert(error))
+        })
+
+        deleteBtn.addEventListener("click", (e) => {
+            e.preventDefault()
+            const isConfirmed = confirm("¿Estás seguro/a de querer borrar este usuario? Esta acción no puede revertirse.")
+
+            if (!isConfirmed) {
+                return
+            }
+
+            fetch(`/user/${id}`,
+                {
+                    method: "DELETE",
+
+                }
+            )
+                .then((response) => response.text().then((result) => {
+                    alert(result)
+                    location.href = "/user"
+                }))
+                .catch((error) => alert(error))
+        })
+    </script>
+</body>
+
+</html>
