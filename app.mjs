@@ -4,10 +4,12 @@ import { user } from './user.mjs';
 
 const { Database } = pkg
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
+
+app.use(express.json())
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
@@ -15,6 +17,9 @@ const db = new Database('./movies.db');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
+
+// Redirecciona todas las rutas que comiencen con /user
+app.use("/user", user)
 
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
@@ -239,8 +244,6 @@ app.get('/director/:id', (req, res) => {
         }
     });
 });
-
-app.use("/user", user)
 
 // Iniciar el servidor
 app.listen(port, () => {
