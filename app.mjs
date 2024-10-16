@@ -1,6 +1,7 @@
 import express from 'express';
 import pkg from 'sqlite3';
 import { user } from './user.mjs';
+import cookieParser from 'cookie-parser';
 
 const { Database } = pkg
 const app = express();
@@ -10,6 +11,8 @@ const port = process.env.PORT || 3000;
 app.use(express.static('views'));
 
 app.use(express.json())
+
+app.use(cookieParser())
 
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
@@ -23,7 +26,21 @@ app.use("/user", user)
 
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
-    res.render('index');
+    if (!req.cookies?.user_id) {
+        return db.all("SELECT * FROM user", [], (error, rows) => {
+            if (error) {
+                return res.status(500).send(error.message ?? "Ocurrió un error al cargar los usuarios.")
+            }
+            return res.render("users", { users: rows })
+        })
+    }
+    return db.all("SELECT * FROM user WHERE user_id = ?", [req.cookies?.user_id], (error, rows) => {
+        if (error || rows.length == 0) {
+            res.clearCookie("user_id")
+            return res.status(500).send(error?.message ?? `Usuario con id ${req.cookies?.user_id} no encontrado. Refresque la página para elegir otro usuario.`)
+        }
+        return res.render("index", { user: rows[0] })
+    })
 });
 
 // Ruta para buscar películas, actores y directores

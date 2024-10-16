@@ -7,15 +7,6 @@ const db = new Database("./movies.db")
 
 const user = express()
 
-user.get("/", (_, res) => {
-    db.all("SELECT * FROM user", [], (error, rows) => {
-        if (error) {
-            return res.status(500).send(error.message)
-        }
-        res.render("users", { users: rows })
-    })
-})
-
 user.get("/add", (_, res) => {
     res.render("add-user")
 })
