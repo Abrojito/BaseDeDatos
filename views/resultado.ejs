@@ -13,29 +13,44 @@
 
     <h2>Películas</h2>
     <ul>
+        <% let foundMovies = false; %>
         <% results.forEach((result) => { %>
             <% if (result.type === 'movie') { %>
                 <li><a href="/pelicula/<%= result.id %>"><%= result.name %></a></li>
+                <% foundMovies = true; %>
             <% } %>
         <% }); %>
+        <% if (!foundMovies) { %>
+            <li>No se han encontrado películas asociadas a la busqueda ingresada.</li>
+        <% } %>
     </ul>
 
     <h2>Actores</h2>
     <ul>
+        <% let foundActors = false; %>
         <% results.forEach((result) => { %>
             <% if (result.type === 'actor') { %>
                 <li><a href="/actor/<%= result.id %>"><%= result.name %></a></li>
+            <% foundActors = true; %>
             <% } %>
         <% }); %>
+        <% if (!foundActors) { %>
+            <li>No se han encontrado actores asociados a la búsqueda ingresada.</li>
+        <% } %>
     </ul>
 
     <h2>Directores</h2>
     <ul>
+        <% let foundDirector = false; %>
         <% results.forEach((result) => { %>
             <% if (result.type === 'director') { %>
                 <li><a href="/director/<%= result.id %>"><%= result.name %></a></li>
+                <% foundDirector = true; %>
             <% } %>
         <% }); %>
+        <% if (!foundDirector) { %>
+            <li>No se han encontrado directores asociados a la búsqueda ingresada</li>
+        <% } %>
     </ul>
 
 <% } %>
