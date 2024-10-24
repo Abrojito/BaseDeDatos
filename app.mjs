@@ -17,12 +17,22 @@ app.use(cookieParser())
 // Path completo de la base de datos movies.db
 // Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 const db = new Database('./movies.db');
+//const users = new sqlite3.Database(__dirname + process.env.USERS);
+
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 
+// Configurar parser de JSON
+app.use(express.json());
+
 // Redirecciona todas las rutas que comiencen con /user
 app.use("/user", user)
+
+// Ruta para la página de inicio
+app.get('/home', (req, res) => {
+    res.render('index');
+});
 
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
@@ -259,6 +269,58 @@ app.get('/director/:id', (req, res) => {
             const directorName = movies.length > 0 ? movies[0].directorName : '';
             res.render('director', { directorName, movies });
         }
+    });
+});
+
+// Ruta para buscar por palabras clave
+app.get("/keyword", (req, res) => {
+    res.render(__dirname + "/views/search_keyword.ejs");
+});
+
+// Funcion para autocompletar la búsqueda
+app.get("/api/autocomplete", (req, res) => {
+    const { q } = req.query;
+    if (q == undefined) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const query = `SELECT k.keyword_name FROM keyword AS k
+    WHERE k.keyword_name LIKE ? ORDER BY k.keyword_name LIMIT 10;`;
+    db.all(query, [`%${q}%`], (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        res.status(200).send(rows);
+    });
+});
+
+// Ruta para visualizar los resultados de la búsqueda por palabras clave
+app.get("/keyword/:q", (req, res) => {
+    res.status(200).render(__dirname + "/views/resultados_keywords.ejs");
+});
+
+// Funcion para buscar por palabras clave
+app.get("/api/keyword", (req, res) => {
+    const { q } = req.query;
+    if (q == undefined) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const query = `SELECT * FROM movie AS m WHERE m.movie_id
+    IN (SELECT m.movie_id FROM movie AS m
+    INNER JOIN movie_keywords AS mk ON m.movie_id
+    = mk.movie_id INNER JOIN keyword AS k
+    ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
+    LIKE ?);`;
+    db.all(query, [`%${q}%`], (err, rows) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        res.status(200).send(rows);
     });
 });
 
