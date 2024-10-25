@@ -8,7 +8,7 @@ El principal objetivo de este proyecto es adquirir experiencia en el desarrollo 
 - Búsqueda de películas, actores y directores.
 - Visualización de la información detallada de películas.
 - Búsqueda de películas por palabras clave.
-- Inicio de sesion con nombre y contraseña.
+- Inicio de sesion.
 
 ### Funcionalidades
 1. Búsqueda de películas, actores y directores:
@@ -23,7 +23,9 @@ El principal objetivo de este proyecto es adquirir experiencia en el desarrollo 
 3. Búsqueda por palabras clave:
 
     - Busca películas relacionadas a través de palabras clave.
-
+4.
+    - Se ingresa nombre de usuario y contraseña.
+  
 ## Instalación
 1. Clonar el repositorio en tu computadora local 
 
