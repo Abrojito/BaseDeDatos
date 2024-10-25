@@ -23,7 +23,8 @@ El principal objetivo de este proyecto es adquirir experiencia en el desarrollo 
 3. Búsqueda por palabras clave:
 
     - Busca películas relacionadas a través de palabras clave.
-4.
+4. Inicio de sesion:
+    
     - Se ingresa nombre de usuario y contraseña.
   
 ## Instalación
