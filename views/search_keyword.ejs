@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MovieWeb</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('/cinema');
+            background-size: cover;
+            background-position: 0 40%;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333333;
+            margin-bottom: 20px;
+            /* Agregamos margen inferior para separar del input */
+        }
+
+        form {
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        button[type="submit"],
+        button {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover,
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        div {
+            position: relative;
+            text-align: center;
+            top: 34.9%;
+        }
+
+        div#results {
+            top: 0;
+            background-color: white;
+            cursor: pointer;
+            margin-bottom: 2vh;
+        }
+
+        div#results :hover {
+            background-color: lightgray;
+        }
+
+        div.keyword {
+            top: 0;
+            padding: 1%;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+<div>
+    <h1>MovieWeb</h1>
+    <form action="/buscar" method="GET" id="form">
+        <input type="text" name="q" placeholder="Buscar películas..." id="input" />
+        <button type="submit">Buscar</button>
+        <div id="results"></div>
+    </form>
+    <button onclick="window.location.href = '/home'" style="margin-top: 1vh;">Inicio</button>
+</div>
+<script>
+    const form = document.getElementById("form");
+    const input = document.getElementById("input");
+    const results = document.getElementById("results");
+    form.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        window.location.href = `keyword/${input.value}`;
+    });
+    form.addEventListener("input", (ev) => {
+        if (input.value.length == 0) {
+            setTimeout(() => {
+                results.replaceChildren();
+            }, 30);
+            return;
+        }
+        fetch(`/api/autocomplete?q=${input.value}`).then(response => response.ok ? response.json().then((result) => {
+            results.replaceChildren();
+            for (keyword of result) {
+                const div = document.createElement("div");
+                div.className = "keyword"
+                div.textContent = keyword.keyword_name;
+                results.append(div);
+                div.addEventListener("click", (ev) => {
+                    window.location.href = `/keyword/${div.textContent}`;
+                });
+            }
+        }) : response.text().then(result => alert(result)));
+    });
+</script>
+</body>
+
+</html>

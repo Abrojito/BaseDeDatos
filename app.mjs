@@ -3,54 +3,160 @@ import pkg from 'sqlite3';
 import { user } from './user.mjs';
 import cookieParser from 'cookie-parser';
 
-const { Database } = pkg
+const { Database } = pkg;
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3009;
 
 // Serve static files from the "views" directory
 app.use(express.static('views'));
 
-app.use(express.json())
-
-app.use(cookieParser())
+// Middleware para parsear JSON
+app.use(express.json());
+app.use(cookieParser());
 
 // Path completo de la base de datos movies.db
-// Por ejemplo 'C:\\Users\\datagrip\\movies.db'
 const db = new Database('./movies.db');
-//const users = new sqlite3.Database(__dirname + process.env.USERS);
-
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
 
-// Configurar parser de JSON
-app.use(express.json());
-
 // Redirecciona todas las rutas que comiencen con /user
-app.use("/user", user)
+app.use("/user", user);
 
 // Ruta para la página de inicio
 app.get('/home', (req, res) => {
     res.render('index');
 });
 
+// Ruta para el formulario de login
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+// Ruta para procesar el formulario de login
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Consulta para verificar al usuario en la BD
+    const query = `SELECT * FROM user WHERE username = ? AND password = ?`;
+
+    db.get(query, [username, password], (err, row) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al verificar el usuario.');
+        }
+        if (row) {
+            // Si el usuario es válido, cookie para mantener la sesión
+            res.cookie('user_id', row.user_id);
+            res.redirect('/'); // Redirigir al home o donde quieras
+        } else {
+            res.status(401).send('Usuario o contraseña incorrectos.');
+        }
+    });
+});
+
+// Ruta para mostrar el formulario de registro
+app.get('/register', (req, res) => {
+    res.render('register');
+});
+
+// Ruta para el perfil del usuario
+app.get('/profile', (req, res) => {
+    const userId = req.cookies.user_id;
+    if (userId) {
+        // Obtener los datos del usuario de la base de datos
+        db.get('SELECT * FROM user WHERE user_id = ?', [userId], (err, user) => {
+            if (err || !user) {
+                res.clearCookie('user_id');
+                return res.redirect('/login'); // Redirige si no se encuentra el usuario
+            }
+            res.render('profile', { user }); // Renderiza el perfil
+        });
+    } else {
+        res.redirect('/login'); // Redirige a la página de login si no hay cookie de usuario
+    }
+});
+/*app.get('/profile/opinions', (req, res) => {
+    const userId = req.cookies?.user_id; // Asegúrate de que estás manejando la cookie de usuario
+
+    if (!userId) {
+        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
+    }
+
+    const query = `
+        SELECT m.title, mu.rating, mu.opinion
+        FROM movie_user mu
+        JOIN movie m ON mu.movie_id = m.movie_id
+        WHERE mu.user_id = ?;
+    `;
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al cargar las opiniones.');
+        }
+        res.render('profile', { movieUserList: rows }); // Renderiza la vista del perfil con los gustos
+    });
+});
+app.post('/add-opinion', (req, res) => {
+    const { userId, movieId, rating, opinion } = req.body;
+
+    const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
+    db.run(query, [userId, movieId, rating, opinion], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al agregar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});
+app.post('/edit-opinion', (req, res) => {
+    const { id, rating, opinion } = req.body;
+
+    const query = `UPDATE movie_user SET rating = ?, opinion = ? WHERE id = ?`;
+    db.run(query, [rating, opinion, id], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al modificar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});
+app.post('/delete-opinion', (req, res) => {
+    const { id } = req.body;
+
+    const query = `DELETE FROM movie_user WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al eliminar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});*/
+
+
+
+// Ruta para el logout
+app.get('/logout', (req, res) => {
+    res.clearCookie('user_id'); // Elimina la cookie de usuario
+    res.redirect('/login'); // Redirige a la página de login
+});
+
+
+
 // Ruta para la página de inicio
 app.get('/', (req, res) => {
     if (!req.cookies?.user_id) {
-        return db.all("SELECT * FROM user", [], (error, rows) => {
-            if (error) {
-                return res.status(500).send(error.message ?? "Ocurrió un error al cargar los usuarios.")
-            }
-            return res.render("users", { users: rows })
-        })
+        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
     }
     return db.all("SELECT * FROM user WHERE user_id = ?", [req.cookies?.user_id], (error, rows) => {
         if (error || rows.length == 0) {
-            res.clearCookie("user_id")
-            return res.status(500).send(error?.message ?? `Usuario con id ${req.cookies?.user_id} no encontrado. Refresque la página para elegir otro usuario.`)
+            res.clearCookie("user_id");
+            return res.status(500).send(error?.message ?? `Usuario con id ${req.cookies?.user_id} no encontrado. Refresque la página para elegir otro usuario.`);
         }
-        return res.render("index", { user: rows[0] })
-    })
+        return res.render("index", { user: rows[0] }); // Renderiza la vista del usuario autenticado
+    });
 });
 
 // Ruta para buscar películas, actores y directores
@@ -323,6 +429,9 @@ app.get("/api/keyword", (req, res) => {
         res.status(200).send(rows);
     });
 });
+
+
+
 
 // Iniciar el servidor
 app.listen(port, () => {

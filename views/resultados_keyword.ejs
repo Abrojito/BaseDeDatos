@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Resultado de la Búsqueda</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<style>
+    .invisible {
+        display: none;
+    }
+</style>
+
+<body>
+<h1>Resultado de la Búsqueda</h1>
+<p id="paragraph" class="invisible">No hay resultados.</p>
+<ul id="results">
+</ul>
+<p></p>
+<div id="inicio"><a href="/home">Inicio</a></div>
+<script>
+    const results = document.getElementById("results");
+    const paragraph = document.getElementById("paragraph");
+    fetch(`/api/keyword?q=${window.location.href.split("/")[4]}`).then((response) => response.ok ? response.json().then((result) => {
+        if (result.length == 0) {
+            paragraph.className = "";
+            results.className = "invisible";
+        }
+        result.forEach((movie) => {
+            const li = document.createElement("li");
+            const anchor = document.createElement("a");
+            anchor.href = `/pelicula/${movie.movie_id}`;
+            anchor.textContent = movie.title;
+            li.append(anchor);
+            results.append(li);
+        });
+    }) : response.text().then((result) => alert(result)));
+</script>
+</body>
+
+</html>
