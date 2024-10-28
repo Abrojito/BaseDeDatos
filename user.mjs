@@ -1,6 +1,6 @@
 import express from "express";
 import pkg from "sqlite3";
-import { getMovieUserList, addReview, updateReview, deleteReview } from "./reviews.mjs";
+import {getMovieUserList, } from "./profile.mjs";
 
 const { Database } = pkg;
 
