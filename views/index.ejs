@@ -6,157 +6,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieWeb</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        /* General page styling */
+        body,
+        html {
             margin: 0;
-            position: relative;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center; /* Center content vertically */
+            justify-content: center; /* Center content horizontally */
+            flex-direction: column; /* Stack elements vertically */
+            position: relative; /* Needed for absolute positioning of user header */
+            width: 100%; /* Full width */
         }
 
-        h1 {
-            font-size: 36px;
-            color: #333333;
-            margin-bottom: 20px;
+        /* Aura background styling */
+        .aura-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
+            radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
+            radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
+            filter: blur(80px);
+            z-index: -1;
         }
 
-        form {
-            text-align: center;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 18px;
-            margin-right: 10px;
-        }
-
-        button[type="submit"] {
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
+        /* User header styles */
         .user-header {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 20px; /* Position it at the top */
+            right: 20px; /* Position it at the right */
             display: flex;
             align-items: center;
-            cursor: pointer;
+            color: #fff; /* White text for user name */
         }
 
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            margin-right: 10px;
-            position: relative;
-            background-image: url("/images/xoaco.png");
+            background-image: url("/images/xoaco.png"); /* Replace with actual image */
             background-size: cover;
             background-position: center;
+            margin-right: 10px;
         }
 
-        .user-name {
-            font-size: 18px;
-            color: #333;
-            position: relative;
+        h1 {
+            color: #fff; /* White text for MovieWeb */
+            margin-bottom: 1rem; /* Margin below the title */
+            font-size: 4rem; /* Increased font size */
+            text-align: center; /* Center text */
+            width: 100%; /* Full width */
         }
 
-        .tooltip {
-            visibility: hidden;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 5px;
-            padding: 5px;
-            position: absolute;
-            top: 50px;
-            right: 0;
-            z-index: 1;
-            font-size: 12px;
-        }
-
-        .user-header:hover .tooltip {
-            visibility: visible;
-        }
-
-        /* Estilos para el menú desplegable */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            margin-left: 10px; /* Espaciado a la izquierda del nombre */
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 20px;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        /* Mostrar el menú al hacer hover en el avatar */
-        .user-header:hover .dropdown-content {
+        /* Input field styling with transparency */
+        input[type="text"] {
+            width: 100%;
+            max-width: 600px; /* Max width for larger screens */
+            padding: 1rem; /* Increased padding */
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.6); /* Semi-transparent border */
+            border-radius: 25px;
+            font-size: 1.2rem; /* Increased font size */
+            color: #fff; /* White text for input */
+            outline: none;
+            background: rgba(255, 255, 255, 0.2); /* Transparent background */
+            text-align: left;
+            padding-left: 15px;
+            transition: background 0.3s ease;
             display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box; /* Include padding in width */
         }
 
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
+        }
+
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.3); /* Slightly more opaque on focus */
+        }
+
+        /* Transparent button styling */
+        button {
+            padding: 0.7rem 1.5rem;
+            background-color: rgba(255, 105, 180, 0.5); /* Semi-transparent hot pink */
+            color: #fff; /* White text for button */
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
             display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
+        button:hover {
+            background-color: rgba(255, 20, 147, 0.5); /* Darker shade on hover, still semi-transparent */
+        }
+
+        /* Additional buttons styling */
+        .additional-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+            width: 100%; /* Full width */
+        }
+
+        .additional-buttons button {
+            margin: 0.5rem 0;
+            background-color: rgba(255, 182, 193, 0.5); /* Semi-transparent light pink */
+        }
+
+        .additional-buttons button:hover {
+            background-color: rgba(255, 105, 180, 0.5); /* Darker pink on hover */
         }
     </style>
 </head>
 
 <body>
+<!-- Aura Background -->
+<div class="aura-background"></div>
+
+<!-- User Header -->
 <div class="user-header">
     <div class="user-avatar"></div>
     <div class="user-name">
         <%= user.user_name %>
     </div>
-    <div class="tooltip">Change user</div>
-
-    <!-- Menú desplegable -->
-    <div class="dropdown">
-        <div class="dropdown-content">
-            <a href="/perfil">Perfil</a>
-            <a href="/logout">Logout</a>
-        </div>
-    </div>
 </div>
 
-<body>
-<a href="/" id="usuario"></a>
 <h1>MovieWeb</h1>
 <form action="/buscar" method="GET">
-    <input type="text" name="q" placeholder="Buscar películas o personas..." />
+    <input type="text" name="q" placeholder="Buscar películas o personas..." required />
     <button type="submit">Buscar</button>
 </form>
-<button onclick="window.location.href = '/keyword'" style="margin-top: 3vh;">Buscar por palabras clave</button>
-<button onclick="window.location.href = '/watchlist'" style="margin-top: 3vh;">Lista de reproduccion</button>
+
+<div class="additional-buttons">
+    <button onclick="window.location.href = '/keyword'">Buscar por palabras clave</button>
+    <button onclick="window.location.href = '/watchlist'">Lista de reproducción</button>
+</div>
+
 <script>
     const usuario = document.getElementById("usuario");
     usuario.textContent = localStorage.getItem("userName");

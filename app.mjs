@@ -296,6 +296,7 @@ app.get('/buscar', (req, res) => {
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
     const movieId = req.params.id;
+    const userId = req.cookies.user_id
 
     // Consulta SQL para obtener los datos de la película, elenco y crew
     const query = `
@@ -425,7 +426,7 @@ app.get('/pelicula/:id', (req, res) => {
                 }
             });
 
-            res.render('pelicula', { movie: movieData });
+            res.render('pelicula', { movie: movieData, user: { id: userId } });
         }
     });
 });
@@ -513,7 +514,7 @@ app.get("/api/autocomplete", (req, res) => {
 
 // Ruta para visualizar los resultados de la búsqueda por palabras clave
 app.get("/keyword/:q", (req, res) => {
-    res.status(200).render(__dirname + "/views/resultados_keywords.ejs");
+    res.status(200).render("resultados_keyword.ejs");
 });
 
 // Funcion para buscar por palabras clave

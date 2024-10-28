@@ -1,0 +1,123 @@
+/* General page styling */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Aura background styling */
+.aura-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+/* Translucent form container styling */
+.form-container {
+    position: relative;
+    padding: 2rem;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    text-align: center;
+    z-index: 1;
+}
+
+h1 {
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+/* Label styling */
+label {
+    display: block;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    max-width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Input field styling with transparency */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    max-width: 250px;
+    padding: 0.7rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 25px;
+    font-size: 1rem;
+    color: #fff;
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    text-align: left;
+    padding-left: 15px;
+    transition: background 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Transparent button styling */
+button {
+    padding: 0.7rem 1.5rem;
+    background-color: rgba(0, 123, 255, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button:hover {
+    background-color: rgba(0, 86, 179, 0.5);
+}
+
+/* Sign-up link styling */
+.signup-link {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.signup-link a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.signup-link a:hover {
+    color: #0056b3;
+}

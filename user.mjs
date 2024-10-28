@@ -68,7 +68,7 @@ user.post("/register", (req, res) => {
             if (error) {
                 return res.status(500).send(error.message);
             }
-            res.status(200).send(`El usuario ${username} ha sido creado`);
+            res.status(200).render('success', { message: `User ${username} has been created successfully!` });
         });
     });
 });

@@ -1,0 +1,70 @@
+/* General page styling */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Aura background styling */
+.aura-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+/* Translucent form container styling */
+.form-container {
+    position: relative;
+    padding: 2rem;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    text-align: center;
+    z-index: 1;
+}
+
+h1 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Success message styling */
+.success-message {
+    font-size: 1rem;
+    color: #d4edda;
+    background-color: rgba(72, 168, 83, 0.3);
+    border: 1px solid rgba(72, 168, 83, 0.5);
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Login link styling */
+.login-link {
+    font-size: 0.9rem;
+    color: #fff;
+    text-decoration: none;
+    background-color: rgba(0, 123, 255, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: background 0.3s ease;
+    display: inline-block;
+}
+
+.login-link:hover {
+    background-color: rgba(0, 86, 179, 0.5);
+}
