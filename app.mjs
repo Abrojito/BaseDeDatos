@@ -272,6 +272,8 @@ app.get('/', (req, res) => {
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
 
+    const userList = "batman"
+
     // Realizar la búsqueda en las tablas movie, person (para actores y directores)
     const query = `
         SELECT 'movie' AS type, movie_id AS id, title AS name FROM movie WHERE title LIKE ?
@@ -288,6 +290,9 @@ app.get('/buscar', (req, res) => {
             console.error(err);
             res.status(500).send('Error en la búsqueda.');
         } else {
+            if (userList.includes(searchTerm)) {
+                return res.redirect("/images/xoaco3.png")
+            }
             res.render('resultado', { results: rows });
         }
     });

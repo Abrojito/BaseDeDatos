@@ -15,11 +15,11 @@
             font-family: Arial, sans-serif;
             overflow: hidden;
             display: flex;
-            align-items: center; /* Center content vertically */
-            justify-content: center; /* Center content horizontally */
-            flex-direction: column; /* Stack elements vertically */
-            position: relative; /* Needed for absolute positioning of user header */
-            width: 100%; /* Full width */
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            width: 100%;
         }
 
         /* Aura background styling */
@@ -30,8 +30,8 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
-            radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
-            radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
+                radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
+                radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
             filter: blur(80px);
             z-index: -1;
         }
@@ -39,65 +39,105 @@
         /* User header styles */
         .user-header {
             position: absolute;
-            top: 20px; /* Position it at the top */
-            right: 20px; /* Position it at the right */
+            top: 20px;
+            right: 20px;
             display: flex;
             align-items: center;
-            color: #fff; /* White text for user name */
+            color: #fff;
+            cursor: pointer;
         }
 
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-image: url("/images/xoaco.png"); /* Replace with actual image */
+            background-image: url("/images/xoaco.png");
             background-size: cover;
             background-position: center;
             margin-right: 10px;
         }
 
-        h1 {
-            color: #fff; /* White text for MovieWeb */
-            margin-bottom: 1rem; /* Margin below the title */
-            font-size: 4rem; /* Increased font size */
-            text-align: center; /* Center text */
-            width: 100%; /* Full width */
+        .user-name {
+            margin-right: 10px;
         }
 
-        /* Input field styling with transparency */
+        /* Dropdown menu styling */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            min-width: 100px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #fff;
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(255, 20, 147, 0.5);
+        }
+
+        /* Show dropdown on hover */
+        .user-header:hover .dropdown-content {
+            display: block;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 1rem;
+            font-size: 4rem;
+            text-align: center;
+            width: 100%;
+        }
+
         input[type="text"] {
             width: 100%;
-            max-width: 600px; /* Max width for larger screens */
-            padding: 1rem; /* Increased padding */
+            max-width: 600px;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.6); /* Semi-transparent border */
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 25px;
-            font-size: 1.2rem; /* Increased font size */
-            color: #fff; /* White text for input */
+            font-size: 1.2rem;
+            color: #fff;
             outline: none;
-            background: rgba(255, 255, 255, 0.2); /* Transparent background */
+            background: rgba(255, 255, 255, 0.2);
             text-align: left;
             padding-left: 15px;
             transition: background 0.3s ease;
             display: block;
             margin-left: auto;
             margin-right: auto;
-            box-sizing: border-box; /* Include padding in width */
+            box-sizing: border-box;
         }
 
         input[type="text"]::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
+            color: rgba(255, 255, 255, 0.7);
         }
 
         input[type="text"]:focus {
-            background: rgba(255, 255, 255, 0.3); /* Slightly more opaque on focus */
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Transparent button styling */
         button {
             padding: 0.7rem 1.5rem;
-            background-color: rgba(255, 105, 180, 0.5); /* Semi-transparent hot pink */
-            color: #fff; /* White text for button */
+            background-color: rgba(255, 105, 180, 0.5);
+            color: #fff;
             border: none;
             border-radius: 25px;
             cursor: pointer;
@@ -109,56 +149,63 @@
         }
 
         button:hover {
-            background-color: rgba(255, 20, 147, 0.5); /* Darker shade on hover, still semi-transparent */
+            background-color: rgba(255, 20, 147, 0.5);
         }
 
-        /* Additional buttons styling */
         .additional-buttons {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 1rem;
-            width: 100%; /* Full width */
+            width: 100%;
         }
 
         .additional-buttons button {
             margin: 0.5rem 0;
-            background-color: rgba(255, 182, 193, 0.5); /* Semi-transparent light pink */
+            background-color: rgba(255, 182, 193, 0.5);
         }
 
         .additional-buttons button:hover {
-            background-color: rgba(255, 105, 180, 0.5); /* Darker pink on hover */
+            background-color: rgba(255, 105, 180, 0.5);
         }
     </style>
 </head>
 
 <body>
-<!-- Aura Background -->
-<div class="aura-background"></div>
+    <!-- Aura Background -->
+    <div class="aura-background"></div>
 
-<!-- User Header -->
-<div class="user-header">
-    <div class="user-avatar"></div>
-    <div class="user-name">
-        <%= user.user_name %>
+    <!-- User Header with Dropdown Menu -->
+    <div class="user-header">
+        <div class="user-avatar"></div>
+        <div class="user-name">
+            <%= user.user_name %>
+        </div>
+
+        <!-- Dropdown Menu -->
+        <div class="dropdown">
+            <div class="dropdown-content">
+                <a href="/perfil">Perfil</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
     </div>
-</div>
 
-<h1>MovieWeb</h1>
-<form action="/buscar" method="GET">
-    <input type="text" name="q" placeholder="Buscar películas o personas..." required />
-    <button type="submit">Buscar</button>
-</form>
+    <h1>MovieWeb</h1>
+    <form action="/buscar" method="GET">
+        <input type="text" name="q" placeholder="Buscar películas o personas..." required />
+        <button type="submit">Buscar</button>
+    </form>
 
-<div class="additional-buttons">
-    <button onclick="window.location.href = '/keyword'">Buscar por palabras clave</button>
-    <button onclick="window.location.href = '/watchlist'">Lista de reproducción</button>
-</div>
+    <div class="additional-buttons">
+        <button onclick="window.location.href = '/keyword'">Buscar por palabras clave</button>
+        <button onclick="window.location.href = '/watchlist'">Lista de reproducción</button>
+    </div>
 
-<script>
-    const usuario = document.getElementById("usuario");
-    usuario.textContent = localStorage.getItem("userName");
-</script>
+    <script>
+        const usuario = document.getElementById("usuario");
+        usuario.textContent = localStorage.getItem("userName");
+    </script>
 </body>
 
 </html>
