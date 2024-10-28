@@ -1,46 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= movie.title %></title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Estilo adicional para centrar el modal */
+        .modal-dialog {
+            max-width: 500px; /* Ajusta el ancho según lo necesites */
+            margin: auto;
+        }
+        /* Estilo para hacer que el fondo sea menos intenso cuando aparece el modal */
+        .modal-backdrop {
+            opacity: 0.5; /* Controla la opacidad del fondo */
+        }
+        /* Centrar el contenido de la página */
+        .centered-content {
+            text-align: center; /* Centra el texto */
+            margin: 0 auto; /* Centra el contenedor */
+            max-width: 800px; /* Ancho máximo para el contenido */
+        }
+        /* Estilo para el argumento */
+        #overview {
+            width: 100%;
+            text-align: justify; /* Justifica el texto */
+            max-width: 800px; /* Agrega margen superior e inferior */
+        }
+    </style>
 </head>
 <body>
-<h1><%= movie.title %></h1>
-<h3>Fecha: <%= movie.release_date %></h3>
-<h3>Dirigida por: </h3>
-<ul>
-    <% movie.directors.forEach((director) => { %>
-        <li>
-            <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
-        </li>
-    <% }); %>
-</ul>
-<h3>Escrita por: </h3>
-<ul>
-    <% movie.writers.forEach((writer) => { %>
-        <li>
-            <%= writer.crew_member_name %>
-        </li>
-    <% }); %>
-</ul>
-<h3>Argumento:</h3>
-<div id="overview"><p><%= movie.overview %></p></div>
-<h3>Elenco:</h3>
-<ul>
-    <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
-        <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
-    <% }); %>
-</ul>
-<h3>Crew:</h3>
-<ul>
-    <% movie.crew.forEach((crewMember) => { %>
-        <li>
-            <%= crewMember.crew_member_name %> - <%= crewMember.department_name %>
-            (<%= crewMember.job %>)
-        </li>
-    <% }); %>
-</ul>
-<p></p>
-<div id="inicio"><a href="/">Inicio</a></div>
+
+<div class="container centered-content">
+    <h1><%= movie.title %></h1>
+    <h3>Fecha: <%= movie.release_date %></h3>
+    <h3>Dirigida por:</h3>
+    <ul>
+        <% movie.directors.forEach((director) => { %>
+            <li>
+                <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
+            </li>
+        <% }); %>
+    </ul>
+    <h3>Escrita por:</h3>
+    <ul>
+        <% movie.writers.forEach((writer) => { %>
+            <li><%= writer.crew_member_name %></li>
+        <% }); %>
+    </ul>
+    <h3>Argumento:</h3>
+    <div id="overview"><p><%= movie.overview %></p></div>
+    <h3>Elenco:</h3>
+    <ul>
+        <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
+            <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
+        <% }); %>
+    </ul>
+    <h3>Crew:</h3>
+    <ul>
+        <% movie.crew.forEach((crewMember) => { %>
+            <li>
+                <%= crewMember.crew_member_name %> - <%= crewMember.department_name %> (<%= crewMember.job %>)
+            </li>
+        <% }); %>
+    </ul>
+
+    <!-- Formulario para dejar una reseña -->
+    <h3>Deja tu reseña:</h3>
+    <form id="reviewForm">
+        <input type="hidden" name="movieId" value="<%= movie.id %>"> <!-- ID de la película -->
+        <input type="hidden" name="userId" value="<%= user.id %>" required> <!-- ID de usuario automático -->
+        <input type="number" name="rating" placeholder="Puntuación (1-5)" min="1" max="5" required>
+        <textarea name="opinion" placeholder="Tu opinión" required></textarea>
+        <button type="submit">Enviar reseña</button>
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Reseña Agregada</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Tu reseña ha sido agregada exitosamente. Puedes ir a tu perfil para verla.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <a href="/perfil" class="btn btn-primary">Ir al Perfil</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("reviewForm").addEventListener("submit", async function (event) {
+        event.preventDefault(); // Evitar el envío normal del formulario
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+
+        try {
+            const response = await fetch(`/movies/${data.movieId}/review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: data.userId,
+                    rating: data.rating,
+                    opinion: data.opinion
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Mostrar el modal
+                $('#reviewModal').modal('show');
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error al agregar la reseña:', error);
+            alert('Error al agregar la reseña. Intenta nuevamente.');
+        }
+    });
+</script>
+
 </body>
 </html>

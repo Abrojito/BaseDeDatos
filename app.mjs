@@ -4,6 +4,9 @@ import { user } from './user.mjs';
 import cookieParser from 'cookie-parser';
 import * as sqlite3 from "sqlite";
 import profile from "./profile.mjs";
+import reviews from "./reviews.mjs"
+import router from "./profile.mjs";
+import path from "path";
 
 const { Database } = pkg;
 const app = express();
@@ -45,7 +48,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     // Consulta para verificar al usuario en la BD
-    const query = `SELECT * FROM user WHERE username = ? AND password = ?`;
+    const query = `SELECT * FROM user WHERE user_username = ? AND user_password = ?`;
 
     db.get(query, [username, password], (err, row) => {
         if (err) {
@@ -66,6 +69,10 @@ app.post('/login', (req, res) => {
 app.get('/register', (req, res) => {
     res.render('register');
 });
+
+// Rutas
+app.use('/movies', reviews); // Usa las rutas de reseñas
+
 
 /*
 // Ruta para el perfil del usuario - Cambiada a '/perfil'
@@ -482,7 +489,7 @@ app.get('/director/:id', (req, res) => {
 
 // Ruta para buscar por palabras clave
 app.get("/keyword", (req, res) => {
-    res.render(__dirname + "/views/search_keyword.ejs");
+    res.render(path.join(__dirname, "/views/search_keyword.ejs"));
 });
 
 // Funcion para autocompletar la búsqueda

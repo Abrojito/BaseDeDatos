@@ -150,6 +150,7 @@ router.delete('/rating/:movieId', async (req, res) => {
 // Eliminar reseña
 router.delete('/review/:movieId', async (req, res) => {
     const userId = req.cookies.user_id;
+    console.log(req.cookies);
     const { movieId } = req.params;
 
     if (!userId) {
@@ -168,6 +169,30 @@ router.delete('/review/:movieId', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar la reseña' });
     }
 });
+/*// Ruta para agregar una reseña
+router.post('/movies/:movieId/review', async (req, res) => {
+    const userId = req.cookies.user_id; // Asegúrate de que el usuario esté autenticado
+    const { movieId } = req.params;
+    const { rating, opinion } = req.body; // Cambié 'review' por 'opinion' según tu tabla
+
+    if (!userId) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    try {
+        await db.run(`
+            INSERT INTO movie_user (user_id, movie_id, rating, opinion)
+            VALUES (?, ?, ?, ?)
+                ON CONFLICT(user_id, movie_id) 
+            DO UPDATE SET rating = ?, opinion = ?
+        `, [userId, movieId, rating, opinion, rating, opinion]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al guardar la reseña:', error);
+        res.status(500).json({ error: 'Error al guardar la reseña' });
+    }
+});*/
 
 export default router;
 
