@@ -6,7 +6,7 @@ import * as sqlite3 from "sqlite";
 import profile from "./profile.mjs";
 import reviews from "./reviews.mjs"
 import router from "./profile.mjs";
-import path from "path";
+import { dirname } from "path";
 
 const { Database } = pkg;
 const app = express();
@@ -489,7 +489,7 @@ app.get('/director/:id', (req, res) => {
 
 // Ruta para buscar por palabras clave
 app.get("/keyword", (req, res) => {
-    res.render(path.join(__dirname, "/views/search_keyword.ejs"));
+    res.render("search_keyword");
 });
 
 // Funcion para autocompletar la búsqueda
