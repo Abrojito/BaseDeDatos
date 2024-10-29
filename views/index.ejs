@@ -1,137 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieWeb</title>
-    <style>
-        /* General page styling */
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            display: flex;
-            align-items: center; /* Center content vertically */
-            justify-content: center; /* Center content horizontally */
-            flex-direction: column; /* Stack elements vertically */
-            position: relative; /* Needed for absolute positioning of user header */
-            width: 100%; /* Full width */
-        }
-
-        /* Aura background styling */
-        .aura-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
-            radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
-            radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
-            filter: blur(80px);
-            z-index: -1;
-        }
-
-        /* User header styles */
-        .user-header {
-            position: absolute;
-            top: 20px; /* Position it at the top */
-            right: 20px; /* Position it at the right */
-            display: flex;
-            align-items: center;
-            color: #fff; /* White text for user name */
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-image: url("/images/xoaco.png"); /* Replace with actual image */
-            background-size: cover;
-            background-position: center;
-            margin-right: 10px;
-        }
-
-        h1 {
-            color: #fff; /* White text for MovieWeb */
-            margin-bottom: 1rem; /* Margin below the title */
-            font-size: 4rem; /* Increased font size */
-            text-align: center; /* Center text */
-            width: 100%; /* Full width */
-        }
-
-        /* Input field styling with transparency */
-        input[type="text"] {
-            width: 100%;
-            max-width: 600px; /* Max width for larger screens */
-            padding: 1rem; /* Increased padding */
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.6); /* Semi-transparent border */
-            border-radius: 25px;
-            font-size: 1.2rem; /* Increased font size */
-            color: #fff; /* White text for input */
-            outline: none;
-            background: rgba(255, 255, 255, 0.2); /* Transparent background */
-            text-align: left;
-            padding-left: 15px;
-            transition: background 0.3s ease;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            box-sizing: border-box; /* Include padding in width */
-        }
-
-        input[type="text"]::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
-        }
-
-        input[type="text"]:focus {
-            background: rgba(255, 255, 255, 0.3); /* Slightly more opaque on focus */
-        }
-
-        /* Transparent button styling */
-        button {
-            padding: 0.7rem 1.5rem;
-            background-color: rgba(255, 105, 180, 0.5); /* Semi-transparent hot pink */
-            color: #fff; /* White text for button */
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s ease;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        button:hover {
-            background-color: rgba(255, 20, 147, 0.5); /* Darker shade on hover, still semi-transparent */
-        }
-
-        /* Additional buttons styling */
-        .additional-buttons {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 1rem;
-            width: 100%; /* Full width */
-        }
-
-        .additional-buttons button {
-            margin: 0.5rem 0;
-            background-color: rgba(255, 182, 193, 0.5); /* Semi-transparent light pink */
-        }
-
-        .additional-buttons button:hover {
-            background-color: rgba(255, 105, 180, 0.5); /* Darker pink on hover */
-        }
-    </style>
+    <link rel="stylesheet" href="styles/index.css">
 </head>
-
 <body>
 <!-- Aura Background -->
 <div class="aura-background"></div>
@@ -139,26 +13,28 @@
 <!-- User Header -->
 <div class="user-header">
     <div class="user-avatar"></div>
-    <div class="user-name">
-        <%= user.user_name %>
+    <div class="user-name"><%= user.user_name %></div>
+    <div class="tooltip">Change user</div>
+    <!-- Dropdown menu -->
+    <div class="dropdown">
+        <div class="dropdown-content">
+            <a href="/perfil">Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
     </div>
 </div>
 
-<h1>MovieWeb</h1>
-<form action="/buscar" method="GET">
-    <input type="text" name="q" placeholder="Buscar películas o personas..." required />
-    <button type="submit">Buscar</button>
-</form>
-
-<div class="additional-buttons">
-    <button onclick="window.location.href = '/keyword'">Buscar por palabras clave</button>
-    <button onclick="window.location.href = '/watchlist'">Lista de reproducción</button>
+<!-- Main Content -->
+<div class="main-content">
+    <h1>MovieWeb</h1>
+    <form action="/buscar" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Search for movies, actors, or by keywords..." required />
+        <button type="submit">Search</button>
+    </form>
 </div>
-
-<script>
-    const usuario = document.getElementById("usuario");
-    usuario.textContent = localStorage.getItem("userName");
-</script>
+<!-- Playlist Button -->
+<div class="playlist-button">
+    <button onclick="window.location.href='/playlist'">My list</button>
+</div>
 </body>
-
 </html>
