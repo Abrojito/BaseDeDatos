@@ -1,19 +1,17 @@
-import express from 'express';
-import pkg from 'sqlite3';
-import { user } from './user.mjs';
-import cookieParser from 'cookie-parser';
-import * as sqlite3 from "sqlite";
+import express from "express";
+import pkg from "sqlite3";
+import { user } from "./user.mjs";
+import cookieParser from "cookie-parser";
 import profile from "./profile.mjs";
-import reviews from "./reviews.mjs"
-import router from "./profile.mjs";
-import { dirname } from "path";
+import reviews from "./reviews.mjs";
+import { searchMovies, searchPeople } from "./search.js";
 
 const { Database } = pkg;
 const app = express();
 const port = process.env.PORT || 3009;
 
 // Serve static files from the "views" directory
-app.use(express.static('views'));
+app.use(express.static("views"));
 
 // Middleware para parsear JSON
 app.use(express.json());
@@ -23,10 +21,10 @@ app.use(cookieParser());
 //  with proper async initialization
 
 // Path completo de la base de datos movies.db
-const db = new Database('./movies.db');
+const db = new Database("./movies.db");
 
 // Configurar el motor de plantillas EJS
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 // Redirecciona todas las rutas que comiencen con /user
 app.use("/user", user);
@@ -34,17 +32,17 @@ app.use("/user", user);
 app.use("/perfil", profile);
 
 // Ruta para la página de inicio
-app.get('/home', (req, res) => {
-    res.render('index');
+app.get("/home", (req, res) => {
+    res.render("index");
 });
 
 // Ruta para el formulario de login
-app.get('/login', (req, res) => {
-    res.render('login');
+app.get("/login", (req, res) => {
+    res.render("login");
 });
 
 // Ruta para procesar el formulario de login
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     // Consulta para verificar al usuario en la BD
@@ -53,26 +51,25 @@ app.post('/login', (req, res) => {
     db.get(query, [username, password], (err, row) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Error al verificar el usuario.');
+            return res.status(500).send("Error al verificar el usuario.");
         }
         if (row) {
             // Si el usuario es válido, cookie para mantener la sesión
-            res.cookie('user_id', row.user_id);
-            res.redirect('/'); // Redirigir al home o donde quieras
+            res.cookie("user_id", row.user_id);
+            res.redirect("/"); // Redirigir al home o donde quieras
         } else {
-            res.status(401).send('Usuario o contraseña incorrectos.');
+            res.status(401).send("Usuario o contraseña incorrectos.");
         }
     });
 });
 
 // Ruta para mostrar el formulario de registro
-app.get('/register', (req, res) => {
-    res.render('register');
+app.get("/register", (req, res) => {
+    res.render("register");
 });
 
 // Rutas
-app.use('/movies', reviews); // Usa las rutas de reseñas
-
+app.use("/movies", reviews); // Usa las rutas de reseñas
 
 /*
 // Ruta para el perfil del usuario - Cambiada a '/perfil'
@@ -244,35 +241,38 @@ app.post('/delete-opinion', (req, res) => {
 });*!/
 */
 
-
-
 // Ruta para el logout
-app.get('/logout', (req, res) => {
-    res.clearCookie('user_id'); // Elimina la cookie de usuario
-    res.redirect('/login'); // Redirige a la página de login
+app.get("/logout", (req, res) => {
+    res.clearCookie("user_id"); // Elimina la cookie de usuario
+    res.redirect("/login"); // Redirige a la página de login
 });
 
-
-
 // Ruta para la página de inicio
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     if (!req.cookies?.user_id) {
-        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
+        return res.redirect("/login"); // Redirige al login si no hay usuario autenticado
     }
-    return db.all("SELECT * FROM user WHERE user_id = ?", [req.cookies?.user_id], (error, rows) => {
-        if (error || rows.length == 0) {
-            res.clearCookie("user_id");
-            return res.status(500).send(error?.message ?? `Usuario con id ${req.cookies?.user_id} no encontrado. Refresque la página para elegir otro usuario.`);
+    return db.all(
+        "SELECT * FROM user WHERE user_id = ?",
+        [req.cookies?.user_id],
+        (error, rows) => {
+            if (error || rows.length == 0) {
+                res.clearCookie("user_id");
+                return res
+                    .status(500)
+                    .send(
+                        error?.message ??
+                        `Usuario con id ${req.cookies?.user_id} no encontrado. Refresque la página para elegir otro usuario.`
+                    );
+            }
+            return res.render("index", { user: rows[0] }); // Renderiza la vista del usuario autenticado
         }
-        return res.render("index", { user: rows[0] }); // Renderiza la vista del usuario autenticado
-    });
+    );
 });
 
 // Ruta para buscar películas, actores y directores
-app.get('/buscar', (req, res) => {
+app.get("/buscar", (req, res) => {
     const searchTerm = req.query.q;
-
-    const userList = "batman"
 
     // Realizar la búsqueda en las tablas movie, person (para actores y directores)
     const query = `
@@ -285,23 +285,24 @@ app.get('/buscar', (req, res) => {
         WHERE person_id IN (SELECT person_id FROM movie_crew WHERE job = 'Director') AND person_name LIKE ?;
     `;
 
-    db.all(query, [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`], (err, rows) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error en la búsqueda.');
-        } else {
-            if (userList.includes(searchTerm)) {
-                return res.redirect("/images/xoaco3.png")
+    db.all(
+        query,
+        [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`],
+        (err, rows) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send("Error en la búsqueda.");
             }
-            res.render('resultado', { results: rows });
+
+            res.render("resultado", { results: rows });
         }
-    });
+    );
 });
 
 // Ruta para la página de datos de una película particular
-app.get('/pelicula/:id', (req, res) => {
+app.get("/pelicula/:id", (req, res) => {
     const movieId = req.params.id;
-    const userId = req.cookies.user_id
+    const userId = req.cookies.user_id;
 
     // Consulta SQL para obtener los datos de la película, elenco y crew
     const query = `
@@ -328,9 +329,9 @@ app.get('/pelicula/:id', (req, res) => {
     db.all(query, [movieId], (err, rows) => {
         if (err) {
             console.error(err);
-            res.status(500).send('Error al cargar los datos de la película.');
+            res.status(500).send("Error al cargar los datos de la película.");
         } else if (rows.length === 0) {
-            res.status(404).send('Película no encontrada.');
+            res.status(404).send("Película no encontrada.");
         } else {
             // Organizar los datos en un objeto de película con elenco y crew
             const movieData = {
@@ -346,15 +347,20 @@ app.get('/pelicula/:id', (req, res) => {
 
             // Crear un objeto para almacenar directores
             rows.forEach((row) => {
-                if (row.crew_member_id && row.crew_member_name && row.department_name && row.job) {
+                if (
+                    row.crew_member_id &&
+                    row.crew_member_name &&
+                    row.department_name &&
+                    row.job
+                ) {
                     // Verificar si ya existe una entrada con los mismos valores en directors
-                    const isDuplicate = movieData.directors.some((crew_member) =>
-                        crew_member.crew_member_id === row.crew_member_id
+                    const isDuplicate = movieData.directors.some(
+                        (crew_member) => crew_member.crew_member_id === row.crew_member_id
                     );
 
                     if (!isDuplicate) {
                         // Si no existe, agregar los datos a la lista de directors
-                        if (row.department_name === 'Directing' && row.job === 'Director') {
+                        if (row.department_name === "Directing" && row.job === "Director") {
                             movieData.directors.push({
                                 crew_member_id: row.crew_member_id,
                                 crew_member_name: row.crew_member_name,
@@ -368,15 +374,20 @@ app.get('/pelicula/:id', (req, res) => {
 
             // Crear un objeto para almacenar writers
             rows.forEach((row) => {
-                if (row.crew_member_id && row.crew_member_name && row.department_name && row.job) {
+                if (
+                    row.crew_member_id &&
+                    row.crew_member_name &&
+                    row.department_name &&
+                    row.job
+                ) {
                     // Verificar si ya existe una entrada con los mismos valores en writers
-                    const isDuplicate = movieData.writers.some((crew_member) =>
-                        crew_member.crew_member_id === row.crew_member_id
+                    const isDuplicate = movieData.writers.some(
+                        (crew_member) => crew_member.crew_member_id === row.crew_member_id
                     );
 
                     if (!isDuplicate) {
                         // Si no existe, agregar los datos a la lista de writers
-                        if (row.department_name === 'Writing' && row.job === 'Writer') {
+                        if (row.department_name === "Writing" && row.job === "Writer") {
                             movieData.writers.push({
                                 crew_member_id: row.crew_member_id,
                                 crew_member_name: row.crew_member_name,
@@ -392,8 +403,8 @@ app.get('/pelicula/:id', (req, res) => {
             rows.forEach((row) => {
                 if (row.actor_id && row.actor_name && row.character_name) {
                     // Verificar si ya existe una entrada con los mismos valores en el elenco
-                    const isDuplicate = movieData.cast.some((actor) =>
-                        actor.actor_id === row.actor_id
+                    const isDuplicate = movieData.cast.some(
+                        (actor) => actor.actor_id === row.actor_id
                     );
 
                     if (!isDuplicate) {
@@ -410,16 +421,25 @@ app.get('/pelicula/:id', (req, res) => {
 
             // Crear un objeto para almacenar el crew
             rows.forEach((row) => {
-                if (row.crew_member_id && row.crew_member_name && row.department_name && row.job) {
+                if (
+                    row.crew_member_id &&
+                    row.crew_member_name &&
+                    row.department_name &&
+                    row.job
+                ) {
                     // Verificar si ya existe una entrada con los mismos valores en el crew
-                    const isDuplicate = movieData.crew.some((crew_member) =>
-                        crew_member.crew_member_id === row.crew_member_id
+                    const isDuplicate = movieData.crew.some(
+                        (crew_member) => crew_member.crew_member_id === row.crew_member_id
                     );
 
                     if (!isDuplicate) {
                         // Si no existe, agregar los datos a la lista de crew
-                        if (row.department_name !== 'Directing' && row.job !== 'Director'
-                            && row.department_name !== 'Writing' && row.job !== 'Writer') {
+                        if (
+                            row.department_name !== "Directing" &&
+                            row.job !== "Director" &&
+                            row.department_name !== "Writing" &&
+                            row.job !== "Writer"
+                        ) {
                             movieData.crew.push({
                                 crew_member_id: row.crew_member_id,
                                 crew_member_name: row.crew_member_name,
@@ -431,13 +451,13 @@ app.get('/pelicula/:id', (req, res) => {
                 }
             });
 
-            res.render('pelicula', { movie: movieData, user: { id: userId } });
+            res.render("pelicula", { movie: movieData, user: { id: userId } });
         }
     });
 });
 
 // Ruta para mostrar la página de un actor específico
-app.get('/actor/:id', (req, res) => {
+app.get("/actor/:id", (req, res) => {
     const actorId = req.params.id;
 
     // Consulta SQL para obtener las películas en las que participó el actor
@@ -455,18 +475,18 @@ app.get('/actor/:id', (req, res) => {
     db.all(query, [actorId], (err, movies) => {
         if (err) {
             console.error(err);
-            res.status(500).send('Error al cargar las películas del actor.');
+            res.status(500).send("Error al cargar las películas del actor.");
         } else {
             // Obtener el nombre del actor
-            const actorName = movies.length > 0 ? movies[0].actorName : '';
+            const actorName = movies.length > 0 ? movies[0].actorName : "";
 
-            res.render('actor', { actorName, movies });
+            res.render("actor", { actorName, movies });
         }
     });
 });
 
 // Ruta para mostrar la página de un director específico
-app.get('/director/:id', (req, res) => {
+app.get("/director/:id", (req, res) => {
     const directorId = req.params.id;
 
     // Consulta SQL para obtener las películas dirigidas por el director
@@ -484,11 +504,11 @@ app.get('/director/:id', (req, res) => {
     db.all(query, [directorId], (err, movies) => {
         if (err) {
             console.error(err);
-            res.status(500).send('Error al cargar las películas del director.');
+            res.status(500).send("Error al cargar las películas del director.");
         } else {
             // Obtener el nombre del director
-            const directorName = movies.length > 0 ? movies[0].directorName : '';
-            res.render('director', { directorName, movies });
+            const directorName = movies.length > 0 ? movies[0].directorName : "";
+            res.render("director", { directorName, movies });
         }
     });
 });
@@ -545,8 +565,16 @@ app.get("/api/keyword", (req, res) => {
     });
 });
 
-
-
+app.get("/api/search", async (req, res) => {
+    const { q } = req.query;
+    console.log("Searching for: ", q);
+    if (!q) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const results = await Promise.all([searchMovies(q), searchPeople(q)]);
+    return res.send([...results[0], ...results[1]]);
+});
 
 // Iniciar el servidor
 app.listen(port, () => {
