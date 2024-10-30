@@ -37,7 +37,7 @@ html {
 }
 
 h1 {
-    color: #fff; /* White text for Login */
+    color: #333;
     margin-bottom: 1.5rem;
 }
 
@@ -51,7 +51,7 @@ input[type="password"] {
     border: 1px solid rgba(255, 255, 255, 0.6); /* Semi-transparent border */
     border-radius: 25px;
     font-size: 1rem;
-    color: #fff; /* White text for Username and Password fields */
+    color: #333;
     outline: none;
     background: rgba(255, 255, 255, 0.2); /* Transparent background */
     text-align: left;
@@ -60,11 +60,6 @@ input[type="password"] {
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-input[type="text"]::placeholder,
-input[type="password"]::placeholder {
-    color: rgba(255, 255, 255, 0.7); /* White placeholder text */
 }
 
 input[type="text"]:focus,
@@ -76,7 +71,7 @@ input[type="password"]:focus {
 button {
     padding: 0.7rem 1.5rem;
     background-color: rgba(0, 123, 255, 0.5); /* Semi-transparent blue */
-    color: #fff; /* White text for button */
+    color: white;
     border: none;
     border-radius: 25px;
     cursor: pointer;
@@ -95,7 +90,7 @@ button:hover {
 .signup-link {
     margin-top: 1rem;
     font-size: 0.8rem;
-    color: #fff; /* White text for sign-up link */
+    color: #333;
 }
 
 .signup-link a {

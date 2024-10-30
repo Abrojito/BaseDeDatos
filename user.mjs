@@ -59,7 +59,7 @@ user.post("/register", (req, res) => {
         }
 
         if (row) {
-            return res.status(400).send("El nombre de usuario ya está registrado.");
+            return res.status(400).send("User already registered");
         }
 
         // Insertar nuevo usuario en la base de datos
