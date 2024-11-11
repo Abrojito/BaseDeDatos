@@ -1,0 +1,126 @@
+/* Existing styles */
+body {
+    background-color: #ffccff;
+    background-image: url("/images/2000s-background.gif");
+    background-repeat: repeat;
+    color: #330033;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 204, 255, 0.9);
+    border: 5px double #ff66ff;
+    box-shadow: 0 0 10px #ff99ff;
+}
+
+.title {
+    text-align: center;
+    font-size: 48px;
+    color: #ff00ff;
+    text-shadow: 2px 2px #ff99ff;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 32px;
+    color: #cc00cc;
+    border-bottom: 2px dotted #ff33cc;
+    margin-top: 40px;
+}
+
+.result-list {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+.result-list li {
+    background-image: url("/images/bullet.gif");
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    padding-left: 20px;
+    line-height: 20px;
+}
+
+.result-list li a {
+    text-decoration: none;
+    color: #990066;
+    font-weight: bold;
+}
+
+.result-list li a:hover {
+    color: #ff00ff;
+    text-decoration: underline;
+}
+
+#inicio {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#inicio a {
+    text-decoration: none;
+    color: #cc0066;
+    font-size: 24px;
+    background-color: #ff99cc;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #ff66cc;
+}
+
+#inicio a:hover {
+    background-color: #ff66cc;
+    color: #ffffff;
+}
+
+/* New styles for the review form */
+form#reviewForm {
+    background-color: #ffe6f9;
+    border: 3px solid #ff66cc;
+    border-radius: 15px;
+    padding: 20px;
+    width: 80%;
+    margin: 30px auto;
+    box-shadow: 0 0 8px #ff99ff;
+    text-align: center;
+}
+
+form#reviewForm input[type="number"],
+form#reviewForm textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #ff66cc;
+    border-radius: 10px;
+    background-color: #ffccff;
+    color: #330033;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+form#reviewForm input[type="number"]:focus,
+form#reviewForm textarea:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 5px #ff99ff;
+}
+
+form#reviewForm button {
+    background-color: #ff66cc;
+    border: 2px solid #ff33cc;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+form#reviewForm button:hover {
+    background-color: #ff00ff;
+    color: #ffffff;
+}
