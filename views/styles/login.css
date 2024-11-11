@@ -9,6 +9,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #fff; /* Texto en blanco por defecto */
 }
 
 /* Aura background styling */
@@ -37,7 +38,7 @@ html {
 }
 
 h1 {
-    color: #333;
+    color: #fff; /* Título en blanco */
     margin-bottom: 1.5rem;
 }
 
@@ -51,7 +52,7 @@ input[type="password"] {
     border: 1px solid rgba(255, 255, 255, 0.6); /* Semi-transparent border */
     border-radius: 25px;
     font-size: 1rem;
-    color: #333;
+    color: #fff; /* Texto en blanco */
     outline: none;
     background: rgba(255, 255, 255, 0.2); /* Transparent background */
     text-align: left;
@@ -62,9 +63,10 @@ input[type="password"] {
     margin-right: auto;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
-    background: rgba(255, 255, 255, 0.3); /* Slightly more opaque on focus */
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+    color: #fff; /* Blanco para el texto del placeholder */
+    opacity: 1; /* Asegura que el blanco sea completamente visible */
 }
 
 /* Transparent button styling */
@@ -90,7 +92,7 @@ button:hover {
 .signup-link {
     margin-top: 1rem;
     font-size: 0.8rem;
-    color: #333;
+    color: #fff; /* Texto de enlace en blanco */
 }
 
 .signup-link a {

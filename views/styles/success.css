@@ -24,25 +24,42 @@ body, html {
     z-index: -1;
 }
 
-/* Form Container styling */
+/* Form container styling */
 .form-container {
-    background-color: rgba(255, 255, 255, 0.8); /* White background with transparency */
-    padding: 40px;
-    border-radius: 10px;
+    position: relative;
+    padding: 2rem;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+    z-index: 1;
 }
 
 /* Success message styling */
 .success-message {
-    font-size: 24px; /* Adjust as needed */
-    color: #fff; /* White text */
-    margin-bottom: 20px; /* Space between message and link */
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 20px;
 }
 
-/* Login link styling */
+/* Centered, rounded button styling */
 .login-link {
-    font-size: 14px; /* Smaller font size */
-    color: #0520ef; /* White text */
-    text-decoration: underline; /* Underlined text */
+    display: flex;
+    justify-content: center;
+}
+
+.login-link button {
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    color: #fff;
+    background: rgba(255, 182, 193, 0.8);
+    border: none;
+    border-radius: 25px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login-link button:hover {
+    background: rgba(255, 182, 193, 1);
 }

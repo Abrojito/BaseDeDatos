@@ -13,7 +13,11 @@
 <!-- Form Container -->
 <div class="form-container">
     <p class="success-message"><%= message %></p>
-    <a href="/login" class="login-link">Login here</a>
+    <!-- Wrapping the button in the .login-link div -->
+    <div class="login-link">
+        <button onclick="window.location.href='/login'">Login Here</button>
+    </div>
 </div>
 </body>
 </html>
+
