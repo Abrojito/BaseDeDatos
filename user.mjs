@@ -1,12 +1,15 @@
 import express from "express";
 import pkg from "sqlite3";
 import {getMovieUserList, } from "./profile.mjs";
-
 const { Database } = pkg;
-
 const db = new Database("./movies.db");
 
+// Inicializa la aplicación Express
 const user = express();
+
+// Configuración para servir archivos estáticos y establecer el motor de plantillas
+user.use(express.static("public"));
+user.set("view engine", "ejs");
 
 // Middleware para parsear el cuerpo de las solicitudes
 user.use(express.urlencoded({ extended: true })); // Para formularios
@@ -59,7 +62,8 @@ user.post("/register", (req, res) => {
         }
 
         if (row) {
-            return res.status(400).send("User already registered");
+            // Si el usuario ya existe, renderizamos la vista de "usuario ya registrado"
+            return res.render("alreadyregistered", { message: `User ${username} is already registered` });
         }
 
         // Insertar nuevo usuario en la base de datos

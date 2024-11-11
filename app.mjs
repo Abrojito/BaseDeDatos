@@ -71,176 +71,6 @@ app.get("/register", (req, res) => {
 // Rutas
 app.use("/movies", reviews); // Usa las rutas de reseñas
 
-/*
-// Ruta para el perfil del usuario - Cambiada a '/perfil'
-app.get('/perfil', async (req, res) => {
-    const userId = req.cookies.user_id;
-
-    if (!userId) {
-        return res.redirect('/login');
-    }
-
-    try {
-        const db = await dbPromise;
-
-        // Obtener datos del usuario
-        const user = await db.get(`
-            SELECT * FROM users
-            WHERE user_id = ?
-        `, userId);
-
-        if (!user) {
-            res.clearCookie('user_id');
-            return res.redirect('/login');
-        }
-
-        // Obtener lista de reproducción del usuario
-        const watchlist = await db.all(`
-            SELECT m.*
-            FROM movies m
-                     JOIN user_watchlist w ON m.movie_id = w.movie_id
-            WHERE w.user_id = ?
-        `, userId);
-
-        // Obtener calificaciones del usuario
-        const ratings = await db.all(`
-            SELECT m.title, r.rating, r.date
-            FROM movies m
-                     JOIN user_ratings r ON m.movie_id = r.movie_id
-            WHERE r.user_id = ?
-            ORDER BY r.date DESC
-        `, userId);
-
-        // Obtener reseñas del usuario
-        const reviews = await db.all(`
-            SELECT m.title, r.review, r.date
-            FROM movies m
-                     JOIN user_reviews r ON m.movie_id = r.movie_id
-            WHERE r.user_id = ?
-            ORDER BY r.date DESC
-        `, userId);
-
-        // Renderizar la vista con todos los datos
-        res.render('perfil', {
-            user,
-            watchlist,
-            ratings,
-            reviews,
-            error: null
-        });
-
-    } catch (error) {
-        console.error('Error al cargar el perfil:', error);
-        res.status(500).render('error', {
-            message: 'Error al cargar el perfil'
-        });
-    }
-});
-
-// También actualiza las rutas de la API para mantener consistencia
-app.post('/api/watchlist/agregar', async (req, res) => {
-    const userId = req.cookies.user_id;
-    if (!userId) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    try {
-        const db = await dbPromise;
-        const { movieId } = req.body;
-
-        await db.run(`
-            INSERT OR IGNORE INTO user_watchlist (user_id, movie_id)
-            VALUES (?, ?)
-        `, [userId, movieId]);
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error al agregar a watchlist:', error);
-        res.status(500).json({ error: 'Error al agregar la película' });
-    }
-});
-
-app.delete('/api/watchlist/eliminar', async (req, res) => {
-    const userId = req.cookies.user_id;
-    if (!userId) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    try {
-        const db = await dbPromise;
-        const { movieId } = req.body;
-
-        await db.run(`
-            DELETE FROM user_watchlist 
-            WHERE user_id = ? AND movie_id = ?
-        `, [userId, movieId]);
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error al eliminar de watchlist:', error);
-        res.status(500).json({ error: 'Error al eliminar la película' });
-    }
-});
-/!*app.get('/profile/opinions', (req, res) => {
-    const userId = req.cookies?.user_id; // Asegúrate de que estás manejando la cookie de usuario
-
-    if (!userId) {
-        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
-    }
-
-    const query = `
-        SELECT m.title, mu.rating, mu.opinion
-        FROM movie_user mu
-        JOIN movie m ON mu.movie_id = m.movie_id
-        WHERE mu.user_id = ?;
-    `;
-
-    db.all(query, [userId], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al cargar las opiniones.');
-        }
-        res.render('profile', { movieUserList: rows }); // Renderiza la vista del perfil con los gustos
-    });
-});
-app.post('/add-opinion', (req, res) => {
-    const { userId, movieId, rating, opinion } = req.body;
-
-    const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
-    db.run(query, [userId, movieId, rating, opinion], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al agregar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});
-app.post('/edit-opinion', (req, res) => {
-    const { id, rating, opinion } = req.body;
-
-    const query = `UPDATE movie_user SET rating = ?, opinion = ? WHERE id = ?`;
-    db.run(query, [rating, opinion, id], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al modificar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});
-app.post('/delete-opinion', (req, res) => {
-    const { id } = req.body;
-
-    const query = `DELETE FROM movie_user WHERE id = ?`;
-    db.run(query, [id], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al eliminar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});*!/
-*/
-
 // Ruta para el logout
 app.get("/logout", (req, res) => {
     res.clearCookie("user_id"); // Elimina la cookie de usuario
@@ -606,6 +436,176 @@ app.get("/api/search", async (req, res) => {
     const results = await Promise.all([searchMovies(q), searchPeople(q)]);
     return res.send([...results[0], ...results[1]]);
 });
+
+/*
+// Ruta para el perfil del usuario - Cambiada a '/perfil'
+app.get('/perfil', async (req, res) => {
+    const userId = req.cookies.user_id;
+
+    if (!userId) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const db = await dbPromise;
+
+        // Obtener datos del usuario
+        const user = await db.get(`
+            SELECT * FROM users
+            WHERE user_id = ?
+        `, userId);
+
+        if (!user) {
+            res.clearCookie('user_id');
+            return res.redirect('/login');
+        }
+
+        // Obtener lista de reproducción del usuario
+        const watchlist = await db.all(`
+            SELECT m.*
+            FROM movies m
+                     JOIN user_watchlist w ON m.movie_id = w.movie_id
+            WHERE w.user_id = ?
+        `, userId);
+
+        // Obtener calificaciones del usuario
+        const ratings = await db.all(`
+            SELECT m.title, r.rating, r.date
+            FROM movies m
+                     JOIN user_ratings r ON m.movie_id = r.movie_id
+            WHERE r.user_id = ?
+            ORDER BY r.date DESC
+        `, userId);
+
+        // Obtener reseñas del usuario
+        const reviews = await db.all(`
+            SELECT m.title, r.review, r.date
+            FROM movies m
+                     JOIN user_reviews r ON m.movie_id = r.movie_id
+            WHERE r.user_id = ?
+            ORDER BY r.date DESC
+        `, userId);
+
+        // Renderizar la vista con todos los datos
+        res.render('perfil', {
+            user,
+            watchlist,
+            ratings,
+            reviews,
+            error: null
+        });
+
+    } catch (error) {
+        console.error('Error al cargar el perfil:', error);
+        res.status(500).render('error', {
+            message: 'Error al cargar el perfil'
+        });
+    }
+});
+
+// También actualiza las rutas de la API para mantener consistencia
+app.post('/api/watchlist/agregar', async (req, res) => {
+    const userId = req.cookies.user_id;
+    if (!userId) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    try {
+        const db = await dbPromise;
+        const { movieId } = req.body;
+
+        await db.run(`
+            INSERT OR IGNORE INTO user_watchlist (user_id, movie_id)
+            VALUES (?, ?)
+        `, [userId, movieId]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al agregar a watchlist:', error);
+        res.status(500).json({ error: 'Error al agregar la película' });
+    }
+});
+
+app.delete('/api/watchlist/eliminar', async (req, res) => {
+    const userId = req.cookies.user_id;
+    if (!userId) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    try {
+        const db = await dbPromise;
+        const { movieId } = req.body;
+
+        await db.run(`
+            DELETE FROM user_watchlist
+            WHERE user_id = ? AND movie_id = ?
+        `, [userId, movieId]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al eliminar de watchlist:', error);
+        res.status(500).json({ error: 'Error al eliminar la película' });
+    }
+});
+/!*app.get('/profile/opinions', (req, res) => {
+    const userId = req.cookies?.user_id; // Asegúrate de que estás manejando la cookie de usuario
+
+    if (!userId) {
+        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
+    }
+
+    const query = `
+        SELECT m.title, mu.rating, mu.opinion
+        FROM movie_user mu
+        JOIN movie m ON mu.movie_id = m.movie_id
+        WHERE mu.user_id = ?;
+    `;
+
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al cargar las opiniones.');
+        }
+        res.render('profile', { movieUserList: rows }); // Renderiza la vista del perfil con los gustos
+    });
+});
+app.post('/add-opinion', (req, res) => {
+    const { userId, movieId, rating, opinion } = req.body;
+
+    const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
+    db.run(query, [userId, movieId, rating, opinion], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al agregar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});
+app.post('/edit-opinion', (req, res) => {
+    const { id, rating, opinion } = req.body;
+
+    const query = `UPDATE movie_user SET rating = ?, opinion = ? WHERE id = ?`;
+    db.run(query, [rating, opinion, id], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al modificar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});
+app.post('/delete-opinion', (req, res) => {
+    const { id } = req.body;
+
+    const query = `DELETE FROM movie_user WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error al eliminar la opinión.');
+        }
+        res.redirect('/profile/opinions');
+    });
+});*!/
+*/
 
 // Iniciar el servidor
 app.listen(port, () => {
