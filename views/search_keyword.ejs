@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieWeb</title>
+    <link rel="stylesheet" href="styles/search_keyword.css">
     <style>
-        body {
+        /* Global body and html styling */
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
@@ -18,6 +22,7 @@
             width: 100%;
         }
 
+        /* Aura background styling */
         .aura-background {
             position: absolute;
             top: 0;
@@ -31,112 +36,171 @@
             z-index: -1;
         }
 
-        /* Estilo del contenedor */
-        div {
-            text-align: center;
-            z-index: 1;
-        }
 
         h1 {
-            font-size: 36px;
-            color: #333333;
-            margin-bottom: 20px;
-            /* Agregamos margen inferior para separar del input */
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
 
-        form {
-            text-align: center;
+        /* Search form styling */
+        .search-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
         }
 
-        input[type="text"] {
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 18px;
-            margin-right: 10px;
+        .search-form input[type="text"] {
+            width: 90%;  /* Cambié el valor a 90% para que ocupe más espacio */
+            max-width: 800px;
+            padding: 0.7rem;
+            font-size: 1rem;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            outline: none;
+            padding-left: 15px;
+            transition: background 0.3s ease;
         }
 
-        button[type="submit"],
-        button {
-            background-color: #ffb6c1;
-            color: white;
+        .search-form input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-form input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-form button {
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            background-color: rgba(0, 123, 255, 0.5);
+            color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 18px;
+            border-radius: 25px;
+            margin-left: 10px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
 
-        button[type="submit"]:hover,
-        button:hover {
-            background-color: #ffb6c1;
+        .search-form button:hover {
+            background-color: rgba(0, 86, 179, 0.5);
         }
 
-        div {
-            position: relative;
+        /* Home button styling */
+        .home-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .home-button button {
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            color: #fff;
+            background: rgba(255, 182, 193, 0.8);
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .home-button button:hover {
+            background: rgba(255, 182, 193, 1);
+        }
+
+        /* Results container styling */
+        #results {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            max-width: 700px;
+            margin: 20px auto;
+            overflow-y: auto;
+            max-height: 300px;
             text-align: center;
-            top: 34.9%;
         }
 
-        div#results {
-            top: 0;
-            background-color: white;
+        #results:not(:empty) {
+            display: block;
+        }
+
+        .result-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 5px;
+            color: #333;
+            font-size: 1rem;
             cursor: pointer;
-            margin-bottom: 2vh;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        div#results :hover {
-            background-color: lightgray;
+        .result-item:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
         }
 
-        div.keyword {
-            top: 0;
-            padding: 1%;
-            text-align: left;
+        .title{
+            text-align: center;
+        }
+
+        .main-content{
+            width: 50%;
         }
     </style>
 </head>
-
 <body>
-<div>
-    <h1>MovieWeb</h1>
-    <form action="/buscar" method="GET" id="form">
-        <input type="text" name="q" placeholder="Buscar películas..." id="input" />
-        <button type="submit">Buscar</button>
-        <div id="results"></div>
+<div class="aura-background"></div>
+<div class="main-content">
+    <h1 class="title">MovieWeb</h1>
+    <form action="/buscar" method="GET" class="search-form" id="form">
+        <input type="text" name="q" placeholder="Search by keyword..." id="input" />
+        <button type="submit">Search</button>
     </form>
-    <button onclick="window.location.href = '/'" style="margin-top: 1vh;">Inicio</button>
+    <div id="results"></div>
+    <div class="home-button">
+        <button onclick="window.location.href = '/'">Home</button>
+    </div>
 </div>
 <script>
     const form = document.getElementById("form");
     const input = document.getElementById("input");
     const results = document.getElementById("results");
+
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
         window.location.href = `keyword/${input.value}`;
     });
-    form.addEventListener("input", (ev) => {
-        if (input.value.length == 0) {
+
+    form.addEventListener("input", () => {
+        if (input.value.length === 0) {
             setTimeout(() => {
                 results.replaceChildren();
             }, 30);
             return;
         }
-        fetch(`/api/autocomplete?q=${input.value}`).then(response => response.ok ? response.json().then((result) => {
-            results.replaceChildren();
-            for (keyword of result) {
-                const div = document.createElement("div");
-                div.className = "keyword"
-                div.textContent = keyword.keyword_name;
-                results.append(div);
-                div.addEventListener("click", (ev) => {
-                    window.location.href = `/keyword/${div.textContent}`;
+
+        fetch(`/api/autocomplete?q=${input.value}`)
+            .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
+            .then(result => {
+                results.replaceChildren();
+                result.forEach(keyword => {
+                    const div = document.createElement("div");
+                    div.className = "result-item";
+                    div.textContent = keyword.keyword_name;
+                    results.appendChild(div);
+                    div.addEventListener("click", () => {
+                        window.location.href = `/keyword/${div.textContent}`;
+                    });
                 });
-            }
-        }) : response.text().then(result => alert(result)));
+            })
+            .catch(error => alert(error));
     });
 </script>
 </body>
-
 </html>

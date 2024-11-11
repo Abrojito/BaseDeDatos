@@ -83,7 +83,6 @@ html {
     top: 20px;
     background-color: rgba(255, 255, 255, 0.9);
     min-width: 160px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 10;
 }
 
@@ -124,7 +123,6 @@ h1 {
 
 .search-form input[type="text"] {
     width: 60%;
-    /* Wider search bar */
     max-width: 600px;
     padding: 0.7rem;
     font-size: 1rem;
@@ -173,9 +171,7 @@ h1 {
     padding: 0.7rem 1.5rem;
     font-size: 1rem;
     color: #fff;
-    /* White text */
     background: rgba(255, 182, 193, 0.8);
-    /* Pastel pink */
     border: none;
     border-radius: 25px;
     outline: none;
@@ -185,14 +181,13 @@ h1 {
 
 .playlist-button button:hover {
     background: rgba(255, 182, 193, 1);
-    /* Slightly more opaque on hover */
 }
 
-/* Search by Keyword button styling */
+/* Search by keyword button styling */
 .keyword-button {
     padding: 0.7rem 1.5rem;
     font-size: 1rem;
-    background-color: rgba(0, 123, 255, 0.5); /* Color azul translúcido */
+    background-color: rgba(0, 123, 255, 0.5);
     color: #fff;
     border: none;
     border-radius: 25px;
@@ -200,50 +195,66 @@ h1 {
     cursor: pointer;
     transition: background 0.3s ease;
     text-align: center;
-    text-transform: uppercase; /* Asegura que el texto esté en mayúsculas */
+    text-transform: none;
 }
 
 /* Hover effect */
 .keyword-button:hover {
-    background-color: rgba(
-            0,
-            86,
-            179,
-            0.5
-    ); /* Color más oscuro al pasar el mouse */
+    background-color: rgba(0, 86, 179, 0.5);
 }
 
-/* Si el botón se encuentra dentro de una clase contenedora, asegúrate de que esa clase también tenga espacio adecuado */
+/* Search form spacing */
 .search-form {
     display: flex;
     justify-content: center;
-    align-items: center; /* Asegura que el contenido esté centrado */
-    margin-top: 20px; /* Opcional, agrega espacio arriba */
+    align-items: center;
+    margin-top: 20px;
 }
 
 .search-form button,
 .keyword-button {
-    margin: 5px; /* Espaciado consistente */
+    margin: 5px;
 }
 
-/* Search by Keyword button styling */
-.keyword-button {
-    padding: 0.7rem 1.5rem;
+/* Results container styling */
+#results {
+    display: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 700px;
+    margin: 20px auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 300px;
+    text-align: center; /* Center content inside */
+}
+
+#results::-webkit-scrollbar {
+    display: none;
+}
+
+/* Show results container only when it has content */
+#results:not(:empty) {
+    display: block;
+}
+
+/* Individual result item styling */
+.result-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    color: #333;
     font-size: 1rem;
-    background-color: rgba(0, 123, 255, 0.5); /* Light blue translucent */
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    margin: 10px;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
-    text-align: center;
-    text-transform: none;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    width: 100%; /* Full width of container */
+    box-sizing: border-box;
 }
 
-/* Hover effect */
-.keyword-button:hover {
-    background-color: rgba(0, 86, 179, 0.7); /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift on hover */
+/* Hover effect for result items */
+.result-item:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
 }
