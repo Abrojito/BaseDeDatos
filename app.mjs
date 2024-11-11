@@ -513,6 +513,37 @@ app.get("/director/:id", (req, res) => {
     });
 });
 
+app.get("/buscar-palabras-clave", (req, res) => {
+    const keywords = req.query.keywords;
+
+    if (!keywords) {
+        return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
+    }
+
+    const query = `
+        SELECT DISTINCT movie.movie_id, movie.title
+        FROM movie
+        LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
+        WHERE movie.title LIKE ?
+           OR keywords.keyword LIKE ?
+           OR movie_cast.character_name LIKE ?
+           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
+           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
+    `;
+
+    const keywordPattern = `%${keywords}%`;
+    db.all(query, [keywordPattern, keywordPattern, keywordPattern, keywordPattern, keywordPattern], (err, rows) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error en la búsqueda de palabras clave.");
+        } else {
+            res.render("resultados_keyword", { results: rows });
+        }
+    });
+});
+
 // Ruta para buscar por palabras clave
 app.get("/keyword", (req, res) => {
     res.render("search_keyword");
