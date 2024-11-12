@@ -152,6 +152,11 @@
         .main-content{
             width: 50%;
         }
+        .selected {
+            background-color: rgba(255, 255, 255, 0); /* Cambia el color de fondo */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Suaviza el cambio */
+        }
+
     </style>
 </head>
 <body>
@@ -159,8 +164,8 @@
 <div class="main-content">
     <h1 class="title">MovieWeb</h1>
     <form action="/buscar" method="GET" class="search-form" id="form">
-        <input type="text" name="q" placeholder="Search by keyword..." id="input" />
-        <button type="submit">Search</button>
+        <input type="text" name="q" placeholder="Search by keyword..." id="input" autocomplete="off" />
+        <button type="button" id="search-btn">Search</button>
     </form>
     <div id="results"></div>
     <div class="home-button">
@@ -171,36 +176,72 @@
     const form = document.getElementById("form");
     const input = document.getElementById("input");
     const results = document.getElementById("results");
+    let selectedIndex = -1;
 
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
         window.location.href = `keyword/${input.value}`;
     });
 
-    form.addEventListener("input", () => {
+    input.addEventListener("input", () => {
         if (input.value.length === 0) {
-            setTimeout(() => {
-                results.replaceChildren();
-            }, 30);
+            setTimeout(() => results.replaceChildren(), 30);
             return;
         }
-
         fetch(`/api/autocomplete?q=${input.value}`)
             .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
             .then(result => {
                 results.replaceChildren();
-                result.forEach(keyword => {
+                selectedIndex = -1; // Reset selection index
+                result.forEach((keyword, index) => {
                     const div = document.createElement("div");
                     div.className = "result-item";
                     div.textContent = keyword.keyword_name;
-                    results.appendChild(div);
+                    div.dataset.index = index;
                     div.addEventListener("click", () => {
                         window.location.href = `/keyword/${div.textContent}`;
                     });
+                    results.appendChild(div);
                 });
             })
             .catch(error => alert(error));
     });
+
+    input.addEventListener("keydown", (ev) => {
+        const items = Array.from(results.children);
+        if (ev.key === "ArrowDown") {
+            ev.preventDefault();
+            if (selectedIndex < items.length - 1) {
+                selectedIndex++;
+            }
+            updateSelection(items);
+        } else if (ev.key === "ArrowUp") {
+            ev.preventDefault();
+            if (selectedIndex > 0) {
+                selectedIndex--;
+            }
+            updateSelection(items);
+        } else if (ev.key === "Enter" && selectedIndex >= 0) {
+            ev.preventDefault();
+            items[selectedIndex].click();
+        }
+    });
+
+    document.getElementById("search-btn").addEventListener("click", () => {
+        const query = input.value;
+        if (query) {
+            window.location.href = `/keyword/${query}`;
+        }
+    });
+
+    function updateSelection(items) {
+        items.forEach((item, index) => {
+            item.classList.toggle("selected", index === selectedIndex);
+            if (index === selectedIndex) {
+                input.value = item.textContent;
+            }
+        });
+    }
 </script>
 </body>
 </html>

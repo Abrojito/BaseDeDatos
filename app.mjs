@@ -380,62 +380,25 @@ app.get("/keyword", (req, res) => {
 });
 
 // Funcion para autocompletar la búsqueda
-app.get("/api/autocomplete", (req, res) => {
-    const { q } = req.query;
-    if (q == undefined) {
-        res.status(400).send("Bad Request");
-        return;
+app.get("/autocomplete", (req, res) => {
+    const searchTerm = req.query.term;
+
+    if (searchTerm) {
+        const query = `SELECT title FROM movie WHERE title LIKE ? LIMIT 10`;
+        db.all(query, [`%${searchTerm}%`], (err, rows) => {
+            if (err) {
+                res.status(500).send("Error fetching autocomplete data.");
+            } else {
+                res.json(rows);
+            }
+        });
+    } else {
+        res.json([]);
     }
-    const query = `SELECT k.keyword_name FROM keyword AS k
-    WHERE k.keyword_name LIKE ? ORDER BY k.keyword_name LIMIT 10;`;
-    db.all(query, [`%${q}%`], (err, rows) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-            return;
-        }
-        res.status(200).send(rows);
-    });
 });
 
 // Ruta para visualizar los resultados de la búsqueda por palabras clave
-app.get("/keyword/:q", (req, res) => {
-    res.status(200).render("resultados_keyword.ejs");
-});
 
-// Funcion para buscar por palabras clave
-app.get("/api/keyword", (req, res) => {
-    const { q } = req.query;
-    if (q == undefined) {
-        res.status(400).send("Bad Request");
-        return;
-    }
-    const query = `SELECT * FROM movie AS m WHERE m.movie_id
-    IN (SELECT m.movie_id FROM movie AS m
-    INNER JOIN movie_keywords AS mk ON m.movie_id
-    = mk.movie_id INNER JOIN keyword AS k
-    ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
-    LIKE ?);`;
-    db.all(query, [`%${q}%`], (err, rows) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send("Internal Server Error");
-            return;
-        }
-        res.status(200).send(rows);
-    });
-});
-
-app.get("/api/search", async (req, res) => {
-    const { q } = req.query;
-    console.log("Searching for: ", q);
-    if (!q) {
-        res.status(400).send("Bad Request");
-        return;
-    }
-    const results = await Promise.all([searchMovies(q), searchPeople(q)]);
-    return res.send([...results[0], ...results[1]]);
-});
 
 /*
 // Ruta para el perfil del usuario - Cambiada a '/perfil'
