@@ -353,9 +353,9 @@ app.get("/director/:id", (req, res) => {
     });
 });
 
+// Ruta de búsqueda por palabras clave
 app.get("/buscar-palabras-clave", (req, res) => {
     const keywords = req.query.keywords;
-    console.log("Keywords recibidos:", keywords); // Depuración
 
     if (!keywords) {
         return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
@@ -364,26 +364,25 @@ app.get("/buscar-palabras-clave", (req, res) => {
     const query = `
         SELECT DISTINCT movie.movie_id, movie.title
         FROM movie
-                 LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-                 LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-                 LEFT JOIN movie_keywords ON movie.movie_id = movie_keywords.movie_id
-                 LEFT JOIN keyword ON movie_keywords.keyword_id = keyword.keyword_id
-        WHERE movie.title LIKE '%acción%'
-           OR keyword.keyword_name LIKE '%acción%'
-           OR movie_cast.character_name LIKE '%acción%'
-           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%')
-           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%');
-
+        LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
+        WHERE movie.title LIKE ?
+           OR keywords.keyword LIKE ?
+           OR movie_cast.character_name LIKE ?
+           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
+           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
     `;
 
     const keywordPattern = `%${keywords}%`;
-    db.all(query, [keywordPattern, keywordPattern, keywordPattern, keywordPattern, keywordPattern], (err, rows) => {
+
+    db.all(query, [keywordPattern], (err, rows) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Error en la búsqueda de palabras clave.");
-        } else {
-            res.render("resultados_keyword", { results: rows });
+            return res.status(500).send("Error en la búsqueda de palabras clave.");
         }
+        // Renderizamos la vista de resultados con las películas encontradas
+        res.render("resultados_keyword", { results: rows });
     });
 });
 
@@ -392,27 +391,45 @@ app.get("/keyword", (req, res) => {
     res.render("search_keyword");
 });
 
-// Funcion para autocompletar la búsqueda
-app.get("/autocomplete", (req, res) => {
-    const searchTerm = req.query.term;
-    if (searchTerm) {
-        const query = `SELECT title FROM movie WHERE title LIKE ? LIMIT 10`;
-        db.all(query, [`%${searchTerm}%`], (err, rows) => {
+// Si `getSuggestions` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
+async function getSuggestions(searchTerm, db) {
+    const query = `
+        SELECT keyword_name
+        FROM keyword
+        WHERE keyword_name LIKE ?
+        LIMIT 10;
+    `;
+    const keywordPattern = `%${searchTerm}%`;
+
+    return new Promise((resolve, reject) => {
+        db.all(query, [keywordPattern], (err, rows) => {
             if (err) {
-                res.status(500).send("Error fetching autocomplete data.");
+                reject("Error en la búsqueda de palabras clave.");
             } else {
-                res.json(rows);
+                resolve(rows);
             }
         });
-    } else {
-        res.json([]);
+    });
+}
+
+// Ejemplo de cómo usarla en una ruta
+app.get("/api/autocomplete", async (req, res) => {
+    const searchTerm = req.query.q;
+
+    if (!searchTerm) {
+        return res.status(400).send("Debe especificar un término de búsqueda.");
+    }
+
+    try {
+        const suggestions = await getSuggestions(searchTerm, db);
+        res.json(suggestions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
     }
 });
-app.get('/api/autocomplete', (req, res) => {
-    const query = req.query.q;
-    const suggestions = getSuggestions(query);  // Tu lógica de autocompletado
-    res.json(suggestions);  // Asegúrate de enviar la respuesta como JSON
-});
+
+
 
 // Ruta para ver la lista de favoritos del usuario
 app.get("/favoritos", (req, res) => {

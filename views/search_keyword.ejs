@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieWeb</title>
-    <link rel="stylesheet" href="styles/search_keyword.css">
+    <link rel="stylesheet" href="/styles/search_keyword.css">
 </head>
 <body>
 <div class="aura-background"></div>
@@ -28,7 +28,7 @@
 
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
-        window.location.href = `/keyword/${input.value}`;
+        window.location.href = `/buscar?q=${encodeURIComponent(input.value)}`;
     });
 
     // Autocompletar: cada vez que se escribe en el input
@@ -39,52 +39,48 @@
         }
 
         // Llamada a la API para autocompletar
-        fetch(`/api/autocomplete?q=${input.value}`)
-            .then(response => response.text())  // Cambiar a .text() para ver la respuesta cruda
-            .then(text => {
-                console.log(text);  // Ver el contenido de la respuesta
-                try {
-                    const result = JSON.parse(text);  // Intentar parsear el JSON manualmente
-                    results.replaceChildren();  // Limpiar resultados anteriores
-                    selectedIndex = -1;  // Reiniciar el índice seleccionado
-                    result.forEach((keyword, index) => {
-                        const div = document.createElement("div");
-                        div.className = "result-item";
-                        div.textContent = keyword.keyword_name;
-                        div.dataset.index = index;
-                        div.addEventListener("click", () => {
-                            window.location.href = `/keyword/${div.textContent}`;
-                        });
-                        results.appendChild(div);
+        fetch(`/api/autocomplete?q=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(result => {
+                results.replaceChildren();  // Limpiar resultados anteriores
+                selectedIndex = -1;  // Reiniciar el índice seleccionado
+                result.forEach((keyword, index) => {
+                    const div = document.createElement("div");
+                    div.className = "result-item";
+                    div.textContent = keyword.keyword_name;
+                    div.dataset.index = index;
+
+                    // Redireccionar a la página de resultados al hacer clic
+                    div.addEventListener("click", () => {
+                        window.location.href = `/buscar?q=${encodeURIComponent(keyword.keyword_name)}`;
                     });
-                } catch (e) {
-                    console.error("Error al parsear la respuesta JSON:", e);  // Capturar errores de parsing
-                    alert("Error al procesar los resultados de búsqueda.");
-                }
+
+                    results.appendChild(div);
+                });
             })
             .catch(error => {
-                console.error("Error al obtener los resultados de búsqueda:", error);
-                alert("Error al obtener los resultados de búsqueda.");
+                console.error("Error al obtener las sugerencias de búsqueda:", error);
             });
+    });
 
     // Manejo de las teclas de flecha
     input.addEventListener("keydown", (ev) => {
         const items = Array.from(results.children);
         if (ev.key === "ArrowDown") {
-            ev.preventDefault();  // Evitar que el cursor se mueva en el input
+            ev.preventDefault();
             if (selectedIndex < items.length - 1) {
-                selectedIndex++;  // Mover hacia abajo
+                selectedIndex++;
             }
             updateSelection(items);
         } else if (ev.key === "ArrowUp") {
-            ev.preventDefault();  // Evitar que el cursor se mueva en el input
+            ev.preventDefault();
             if (selectedIndex > 0) {
-                selectedIndex--;  // Mover hacia arriba
+                selectedIndex--;
             }
             updateSelection(items);
         } else if (ev.key === "Enter" && selectedIndex >= 0) {
-            ev.preventDefault();  // Evitar acción por defecto de Enter
-            items[selectedIndex].click();  // Hacer clic en el elemento seleccionado
+            ev.preventDefault();
+            items[selectedIndex].click();  // Redirigir al hacer Enter sobre la sugerencia seleccionada
         }
     });
 
@@ -92,17 +88,17 @@
     function updateSelection(items) {
         items.forEach((item, index) => {
             item.classList.toggle("selected", index === selectedIndex);
+            if (index === selectedIndex) {
+                input.value = item.textContent;  // Actualizar el valor del input con la selección
+            }
         });
-        if (selectedIndex >= 0 && selectedIndex < items.length) {
-            input.value = items[selectedIndex].textContent;  // Actualizar el valor del input con la selección
-        }
     }
 
     // Manejo del botón de búsqueda
     document.getElementById("search-btn").addEventListener("click", () => {
         const query = input.value;
         if (query) {
-            window.location.href = `/keyword/${query}`;
+            window.location.href = `/buscar?q=${encodeURIComponent(query)}`;
         }
     });
 </script>
