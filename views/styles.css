@@ -1,3 +1,4 @@
+/* Estilos generales */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f5f5f5;
@@ -13,17 +14,34 @@ h1 {
     font-size: 36px;
     color: #333333;
     margin-bottom: 20px;
+    text-align: center;
 }
 
+/* Estilos para el contenedor de favoritos */
 ul {
     list-style: none;
     padding: 0;
+    width: 60%;
 }
 
 li {
     margin: 10px 0;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+li span {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* Enlaces generales */
 a {
     text-decoration: none;
     color: #0078d4;
@@ -34,6 +52,40 @@ a:hover {
     color: #0056b3;
 }
 
+/* Botón para eliminar favorito */
+button {
+    cursor: pointer;
+    padding: 8px 12px;
+    background-color: #ff5c5c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e04a4a;
+}
+
+/* Estilos para el botón "Volver al Inicio" */
+#inicio {
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+#inicio:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para contenido adicional (colapsable) */
 .collapsible {
     cursor: pointer;
     user-select: none;
@@ -43,6 +95,7 @@ a:hover {
     border: none;
     border-radius: 4px;
     text-align: center;
+    margin-bottom: 15px;
 }
 
 .content {
@@ -51,20 +104,9 @@ a:hover {
     background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 4px;
+    margin-top: 10px;
 }
 
 .active {
     display: block;
-}
-
-#overview {
-    width: 50%;
-    margin: 0 auto; /* Centrar horizontalmente el elemento */
-    padding: 10px; /* Agregar un poco de espacio interior para que se vea mejor */
-    background-color: #ffffff; /* Opcional: agregar un fondo blanco al elemento */
-}
-
-#inicio {
-    margin: 0 auto; /* Centrar horizontalmente el elemento */
-    padding: 50px; /* Agregar un poco de espacio interior para que se vea mejor */
 }
