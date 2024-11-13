@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+<div class="aura-background"></div>
 <h1>Películas dirigidas por <%= directorName %></h1>
 <ul>
     <% movies.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>

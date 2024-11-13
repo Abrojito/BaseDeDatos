@@ -354,39 +354,31 @@ app.get("/director/:id", (req, res) => {
 });
 
 // Ruta de búsqueda por palabras clave
-app.get("/buscar-palabras-clave", (req, res) => {
+app.get('/buscar-palabras-clave', (req, res) => {
     const keywords = req.query.keywords;
-
     if (!keywords) {
-        return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
+        return res.status(400).send("No se proporcionaron palabras clave.");
     }
 
-    const query = `
-        SELECT DISTINCT movie.movie_id, movie.title
-        FROM movie
-        LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
-        WHERE movie.title LIKE ?
-           OR keywords.keyword LIKE ?
-           OR movie_cast.character_name LIKE ?
-           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
-           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
-    `;
+    // Aquí deberías realizar la lógica de búsqueda en tu base de datos
+    // y devolver los resultados o manejar el caso de que no haya resultados
 
-    const keywordPattern = `%${keywords}%`;
-
-    db.all(query, [keywordPattern], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send("Error en la búsqueda de palabras clave.");
-        }
-        // Renderizamos la vista de resultados con las películas encontradas
-        res.render("resultados_keyword", { results: rows });
-    });
+    // Supongamos que tienes una función `buscarPorPalabrasClave`:
+    buscarPorPalabrasClave(keywords)
+        .then(resultados => {
+            if (resultados.length > 0) {
+                res.render('resultados', { resultados }); // Asegúrate de tener una vista 'resultados'
+            } else {
+                res.send("No se encontraron resultados para las palabras clave proporcionadas.");
+            }
+        })
+        .catch(error => {
+            console.error("Error en la búsqueda:", error);
+            res.status(500).send("Hubo un problema con la búsqueda.");
+        });
 });
 
-// Ruta para buscar por palabras clave
+
 app.get("/keyword", (req, res) => {
     res.render("search_keyword");
 });
@@ -502,6 +494,6 @@ app.post("/favoritos/eliminar", (req, res) => {
 });
 
 // Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor en ejecución en http://localhost:${port}`);
+app.listen(3009, () => {
+    console.log('Servidor escuchando en el puerto 3009');
 });
