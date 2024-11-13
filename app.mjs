@@ -345,6 +345,7 @@ app.get("/director/:id", (req, res) => {
 
 app.get("/buscar-palabras-clave", (req, res) => {
     const keywords = req.query.keywords;
+    console.log("Keywords recibidos:", keywords); // Depuración
 
     if (!keywords) {
         return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
@@ -353,14 +354,16 @@ app.get("/buscar-palabras-clave", (req, res) => {
     const query = `
         SELECT DISTINCT movie.movie_id, movie.title
         FROM movie
-        LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
-        WHERE movie.title LIKE ?
-           OR keywords.keyword LIKE ?
-           OR movie_cast.character_name LIKE ?
-           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
-           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
+                 LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+                 LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+                 LEFT JOIN movie_keywords ON movie.movie_id = movie_keywords.movie_id
+                 LEFT JOIN keyword ON movie_keywords.keyword_id = keyword.keyword_id
+        WHERE movie.title LIKE '%acción%'
+           OR keyword.keyword_name LIKE '%acción%'
+           OR movie_cast.character_name LIKE '%acción%'
+           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%')
+           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%');
+
     `;
 
     const keywordPattern = `%${keywords}%`;

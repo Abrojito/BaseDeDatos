@@ -9,31 +9,37 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Seleccionar usuario</h1>
-        <div class="user-selection">
-            <% users.forEach((user)=> { %>
-                <div class="user-card" onclick="setCookie('user_id', '<%= user.user_id %>', 1)">
-                    <img src="/images/xoaco.png" alt="<%= user.user_name %>" style="max-width: 150px;">
-                    <p>
-                        <%= user.user_name %>
-                    </p>
-                    <button class="add-user-btn"
-                        onclick="event.stopPropagation(); location.href='/user/edit?id=<%= user.user_id %>&username=<%= user.user_username %>&name=<%= user.user_name %>&email=<%= user.user_email %>'">Editar</button>
-                </div>
-                <% }) %>
-        </div>
-        <button id="add-button" class="add-user-btn" onclick="location.href='/user/add'">Agregar usuario</button>
+<div class="container">
+    <h1>Seleccionar usuario</h1>
+    <div class="user-selection">
+        <% users.forEach((user) => { %>
+            <div class="user-card" onclick="setCookie('user_id', '<%= user.id %>', 1)">
+                <img src="/images/xoaco.png" alt="<%= user.username %>" style="max-width: 150px;">
+                <p>
+                    <%= user.username %>
+                </p>
+                <p><strong>Email:</strong> <%= user.email %></p>
+                <p><strong>Rol:</strong> <%= user.user_role %></p>
+                <button class="add-user-btn"
+                        onclick="event.stopPropagation(); location.href='/user/edit?id=<%= user.id %>&username=<%= user.username %>&name=<%= user.name %>&email=<%= user.email %>'">Editar</button>
+            </div>
+        <% }) %>
     </div>
-    <script>
-        function setCookie(name, value, days) {
-            const d = new Date()
-            d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000))
-            let expires = "expires=" + d.toUTCString()
-            document.cookie = name + "=" + value + ";" + expires + ";path=/"
-            location.reload()
-        }
-    </script>
+    <% if (currentUserRole === 'admin') { %>
+        <button id="add-button" class="add-user-btn" onclick="location.href='/user/add'">Agregar usuario</button>
+    <% } else { %>
+        <p class="warning">No tienes permisos para agregar usuarios.</p>
+    <% } %>
+</div>
+<script>
+    function setCookie(name, value, days) {
+        const d = new Date();
+        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        location.reload();
+    }
+</script>
 </body>
 
 </html>
