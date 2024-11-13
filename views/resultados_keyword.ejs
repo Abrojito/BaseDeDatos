@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados de búsqueda</title>
+    <title>Search results</title>
     <link rel="stylesheet" href="/styles/search_keyword.css">
     <style>
         /* Reset */
@@ -84,35 +84,42 @@
     </style>
 </head>
 <body>
-<h1>Resultados de búsqueda</h1>
+<h1>Search results</h1>
 <ul id="results"></ul>
 <div class="home-button">
-    <button onclick="window.location.href='/'">Inicio</button>
+    <button onclick="window.location.href='/'">Home</button>
 </div>
 <script>
     const results = document.getElementById("results");
 
-    // Obtiene la palabra clave de la URL y realiza la solicitud al servidor
-    const keyword = window.location.href.split("/")[4];
-    fetch(`/api/keyword?q=${keyword}`)
-        .then(response => response.ok ? response.json() : Promise.reject("Error al obtener los resultados"))
-        .then(data => {
-            if (data.length === 0) {
-                const paragraph = document.createElement("p");
-                paragraph.textContent = "No se encontraron resultados.";
-                paragraph.style.color = "#fff";
-                paragraph.style.textAlign = "center";
-                results.append(paragraph);
-            } else {
-                data.forEach(movie => {
-                    const anchor = document.createElement("a");
-                    anchor.href = `/pelicula/${movie.movie_id}`;
-                    anchor.textContent = movie.title;
-                    results.append(anchor);
-                });
-            }
-        })
-        .catch(error => alert(error));
+    // Obtiene la palabra clave del parámetro de consulta
+    const urlParams = new URLSearchParams(window.location.search);
+    const keyword = urlParams.get('q');
+
+    // Verifica que keyword no sea null
+    if (keyword) {
+        fetch(`/api/keyword?q=${keyword}`)
+            .then(response => response.ok ? response.json() : Promise.reject("Error al obtener los resultados"))
+            .then(data => {
+                if (data.length === 0) {
+                    const paragraph = document.createElement("p");
+                    paragraph.textContent = "No se encontraron resultados.";
+                    paragraph.style.color = "#fff";
+                    paragraph.style.textAlign = "center";
+                    results.append(paragraph);
+                } else {
+                    data.forEach(movie => {
+                        const anchor = document.createElement("a");
+                        anchor.href = `/pelicula/${movie.movie_id}`;
+                        anchor.textContent = movie.title;
+                        results.append(anchor);
+                    });
+                }
+            })
+            .catch(error => alert(error));
+    } else {
+        alert("Palabra clave no proporcionada en la URL.");
+    }
 </script>
 </body>
 </html>
