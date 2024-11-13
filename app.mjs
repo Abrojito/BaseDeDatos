@@ -23,9 +23,72 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from the "views" directory
 app.use(express.static("views"));
 
+
+
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(cookieParser());
+
+// Establecer EJS como motor de plantillas
+app.set('view engine', 'ejs');   // Esto le dice a Express que use EJS como motor de plantillas
+app.set('views', path.join(__dirname, 'views')); // Carpeta donde están tus vistas
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const users = [
+        { id: 1, username: 'Juan', email: 'juan@correo.com' },
+        { id: 2, username: 'Ana', email: 'ana@correo.com' },
+    ];
+    const currentUserRole = 'admin'; // Cambia esto según el rol de tu usuario
+    res.render('user_list', { users, currentUserRole });
+});
+
+
 
 // Database setup
 //  with proper async initialization
@@ -501,7 +564,84 @@ app.post("/favoritos/eliminar", (req, res) => {
     });
 });
 
+// Middleware para verificar si el usuario es admin
+const isAdmin = (req, res, next) => {
+    const userId = req.cookies.user_id;
+
+    if (!userId) {
+        return res.redirect("/login");
+    }
+
+    const checkAdminQuery = "SELECT user_role FROM user WHERE user_id = ?";
+    db.get(checkAdminQuery, [userId], (err, userRow) => {
+        if (err) {
+            return res.status(500).send("Error al verificar permisos de usuario.");
+        }
+
+        if (!userRow || userRow.user_role !== 'admin') {
+            return res.status(403).send("Acceso denegado. Solo administradores pueden acceder a esta página.");
+        }
+
+        next();
+    });
+};
+
+// Ruta para listar usuarios (solo admin)
+app.get("/admin/users", isAdmin, (req, res) => {
+    const getAllUsersQuery = `
+        SELECT user_id, user_username, user_name, user_email, user_role 
+        FROM user
+        ORDER BY user_id`;
+
+    db.all(getAllUsersQuery, [], (error, users) => {
+        if (error) {
+            return res.status(500).send("Error al obtener la lista de usuarios.");
+        }
+        res.render("admin/users", { users });
+    });
+});
+
+// Ruta para eliminar usuario (solo admin)
+app.delete("/admin/users/:id", isAdmin, (req, res) => {
+    const userIdToDelete = req.params.id;
+    const adminId = req.cookies.user_id;
+
+    // Evitar que el admin se elimine a sí mismo
+    if (userIdToDelete === adminId) {
+        return res.status(400).json({
+            success: false,
+            message: "No puedes eliminar tu propio usuario administrador"
+        });
+    }
+
+    const deleteUserQuery = "DELETE FROM user WHERE user_id = ?";
+
+    db.run(deleteUserQuery, [userIdToDelete], function(error) {
+        if (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Error al eliminar el usuario"
+            });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Usuario eliminado correctamente"
+        });
+    });
+});
+
+
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor en ejecución en http://localhost:${port}`);
 });
+
