@@ -1,0 +1,49 @@
+<!-- Ejemplo de listado de usuarios en admin/users.ejs -->
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% users.forEach(function(user) { %>
+        <tr>
+            <td><%= user.user_username %></td>
+            <td><%= user.user_email %></td>
+            <td><%= user.user_role %></td>
+            <td>
+                <!-- Botón para eliminar usuario -->
+                <button class="delete-btn" data-id="<%= user.user_id %>">Eliminar</button>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<script>
+    // JavaScript para manejar la eliminación de usuarios
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-id");
+            if (confirm("¿Estás seguro de que deseas eliminar a este usuario?")) {
+                fetch(`/admin/users/${userId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        location.reload(); // Recargar la página después de eliminar
+                    })
+                    .catch(error => {
+                        alert("Error al eliminar el usuario.");
+                    });
+            }
+        });
+    });
+</script>
