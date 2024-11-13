@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Películas Favoritas</title>
+    <link rel="stylesheet" href="styles/favoritos.css"> <!-- Estilo específico para favoritos -->
+</head>
+<body>
+    <div class="aura-background"></div>
+    <h1>Mis Películas Favoritas</h1>
+    
+    <ul>
+        <% if (movies.length > 0) { %>
+            <% movies.forEach(movie => { %>
+                <li>
+                    <span><%= movie.title %></span>
+                    <button onclick="removeFavorite(<%= movie.movie_id %>)">Eliminar</button>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <p>No tienes películas en tus favoritos.</p>
+        <% } %>
+    </ul>
+
+    <!-- Botón para volver al inicio -->
+    <button id="inicio" onclick="window.location.href='/'">Volver al Inicio</button>
+
+    <script>
+        function removeFavorite(movieId) {
+            fetch('/favoritos/eliminar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ movieId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Película eliminada de favoritos.');
+                    window.location.reload();
+                } else {
+                    alert('Error al eliminar la película de favoritos.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

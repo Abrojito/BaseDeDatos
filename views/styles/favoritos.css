@@ -1,0 +1,114 @@
+/* Reset de margen y padding para body y html */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+}
+
+/* Fondo con efecto de aura */
+.aura-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 82, 82, 0.6),
+            transparent 60%
+        ),
+        radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+/* Encabezado principal */
+h1 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+/* Contenedor de la lista de favoritos */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 80%;
+    max-width: 600px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para cada elemento de la lista de películas */
+ul li {
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+ul li:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+}
+
+/* Estilo para el título de la película */
+ul li span {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* Botón para eliminar películas */
+button {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ff4c4c;
+}
+
+/* Botón para volver al inicio */
+#inicio {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    color: #fff;
+    background: rgba(255, 182, 193, 0.8);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#inicio:hover {
+    background: rgba(255, 182, 193, 1);
+}
