@@ -3,39 +3,143 @@
 
 <head>
     <title>Resultado de la Búsqueda</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        /* General styles */
+        body {
+            background-color: #f8f9fa; /* Color claro para mejor legibilidad */
+            background-image: url("/images/2000s-background.gif");
+            background-repeat: repeat;
+            color: #333; /* Texto oscuro para mejor contraste */
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 5px double #6f42c1; /* Púrpura Bootstrap */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Título principal */
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            color: #6f42c1;
+            text-shadow: 1px 1px #d6b8e4;
+            margin-bottom: 30px;
+        }
+
+        /* Mensaje de "No hay resultados" */
+        #paragraph {
+            text-align: center;
+            font-size: 20px;
+            color: #dc3545; /* Rojo Bootstrap */
+            margin-top: 20px;
+        }
+
+        /* Lista de resultados */
+        ul#results {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        ul#results li {
+            background: #e9ecef;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        ul#results li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilos para los enlaces de resultados */
+        ul#results li a {
+            text-decoration: none;
+            color: #007bff; /* Azul Bootstrap */
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        ul#results li a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Botón de inicio */
+        #inicio {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #inicio a {
+            text-decoration: none;
+            font-size: 20px;
+            background-color: #007bff; /* Azul Bootstrap */
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+        }
+
+        #inicio a:hover {
+            background-color: #0056b3;
+            color: #e9ecef;
+        }
+
+        /* Invisible class */
+        .invisible {
+            display: none;
+        }
+    </style>
 </head>
-<style>
-    .invisible {
-        display: none;
-    }
-</style>
 
 <body>
-<h1>Resultado de la Búsqueda</h1>
-<p id="paragraph" class="invisible">No hay resultados.</p>
-<ul id="results">
-</ul>
-<p></p>
-<div id="inicio"><a href="/">Inicio</a></div>
+<div class="container">
+    <h1>Resultado de la Búsqueda</h1>
+    <p id="paragraph" class="invisible">No hay resultados.</p>
+    <ul id="results"></ul>
+    <div id="inicio"><a href="/">Inicio</a></div>
+</div>
+
 <script>
     const results = document.getElementById("results");
     const paragraph = document.getElementById("paragraph");
-    fetch(`/api/keyword?q=${window.location.href.split("/")[4]}`).then((response) => response.ok ? response.json().then((result) => {
-        console.log(result)
-        if (result.length == 0) {
-            paragraph.className = "";
-            results.className = "invisible";
-        }
-        result.forEach((movie) => {
-            const li = document.createElement("li");
-            const anchor = document.createElement("a");
-            anchor.href = `/pelicula/${movie.movie_id}`;
-            anchor.textContent = movie.title;
-            li.append(anchor);
-            results.append(li);
+
+    fetch(`/api/keyword?q=${window.location.href.split("/")[4]}`)
+        .then((response) => response.ok ? response.json() : Promise.reject(response.statusText))
+        .then((result) => {
+            if (result.length === 0) {
+                paragraph.className = "";
+                results.className = "invisible";
+            } else {
+                result.forEach((movie) => {
+                    const li = document.createElement("li");
+                    const anchor = document.createElement("a");
+                    anchor.href = `/pelicula/${movie.movie_id}`;
+                    anchor.textContent = movie.title;
+                    li.append(anchor);
+                    results.append(li);
+                });
+            }
+        })
+        .catch((error) => {
+            alert("Error al cargar los resultados: " + error);
         });
-    }) : response.text().then((result) => alert(result)));
 </script>
 </body>
 

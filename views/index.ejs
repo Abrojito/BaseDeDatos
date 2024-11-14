@@ -6,6 +6,189 @@
     <title>MovieWeb</title>
 
     <link rel="stylesheet" href="styles/index.css" />
+    <style>
+        /* Estilos del botón 'View User List' en el borde izquierdo */
+        .view-user-list-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .view-user-list-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-user-list-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+        }
+
+        .view-user-list-btn:active {
+            transform: translateY(2px);
+        }
+
+        /* Nuevo contenedor para el perfil y dropdown */
+        .profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* Estilos para el dropdown */
+        .dropdown {
+            display: none;
+            position: absolute;
+            /* Opción 1: usando calc() */
+            top: calc(100% - 40px);  /* Subimos 40px desde su posición original */
+
+            /* O podrías usar cualquiera de estas alternativas: */
+            /* top: calc(100% - 50px); */ /* Sube 50px */
+            /* top: 60%; */  /* Posiciona al 60% del contenedor */
+            /* top: 50%; */  /* Posiciona a la mitad del contenedor */
+            /* top: -20px; */ /* Sube 20px desde el borde inferior */
+
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1000;
+        }
+
+        .profile-container:hover .dropdown {
+            display: block;
+        }
+
+        .dropdown-content {
+            min-width: 150px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Tooltip solo aparece al hover sobre el profile-container */
+        .tooltip {
+            display: none;
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .profile-container:hover .tooltip {
+            display: block;
+        }
+
+        /* Estilos para el contenido principal */
+        .main-content {
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+        .search-form {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        .search-form input {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .keyword-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Estilos para los resultados de búsqueda */
+        #results {
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .result-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Estilos para el botón de playlist */
+        .playlist-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .playlist-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-button button:hover {
+            background-color: #c82333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 
 <body>
@@ -17,14 +200,17 @@
     <!-- Button for 'View User List' -->
     <button onclick="window.location.href='/user/list'" class="view-user-list-btn">View User List</button>
 
-    <div class="user-avatar"></div>
-    <div class="user-name"><%= user.user_name %></div>
-    <div class="tooltip">Change user</div>
-    <!-- Dropdown menu -->
-    <div class="dropdown">
-        <div class="dropdown-content">
-            <a href="/perfil">Profile</a>
-            <a href="/logout">Logout</a>
+    <!-- Nuevo contenedor para el perfil -->
+    <div class="profile-container">
+        <div class="user-avatar"></div>
+        <div class="user-name"><%= user.user_name %></div>
+        <div class="tooltip">Change user</div>
+        <!-- Dropdown menu -->
+        <div class="dropdown">
+            <div class="dropdown-content">
+                <a href="/perfil">Profile</a>
+                <a href="/logout">Logout</a>
+            </div>
         </div>
     </div>
 </div>
@@ -60,8 +246,6 @@
     const input = document.getElementById("input");
     const results = document.getElementById("results");
     const keywordSearchBtn = document.getElementById("keyword-search-btn");
-    let isRequestInProgress = false;
-    let pendingQuery = null; // Holds the next query if user types while request is in progress
 
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
@@ -73,57 +257,38 @@
     });
 
     input.addEventListener("input", (ev) => {
-            const query = input.value;
+        const query = input.value;
+        if (query.length === 0) {
+            results.replaceChildren();
+            return;
+        }
 
-            if (query.length === 0) {
-                results.replaceChildren();
-                return;
-            }
-
-            // If a request is in progress, set the pending query
-            if (isRequestInProgress) {
-                pendingQuery = query;
-                return;
-            }
-
-            // Execute the search for the current input value
-            performSearch(query);
-        });
+        performSearch(query);
+    });
 
     function performSearch(query) {
-            isRequestInProgress = true;
-            fetch(`http://localhost:3009/api/search?q=${query}`)
-                .then((response) =>
-                    response.ok ? response.json() : Promise.reject(response.statusText)
-                )
-                .then((result) => {
-                    results.replaceChildren();
-                    result.forEach((item) => {
-                        const div = document.createElement("div");
-                        div.className = "result-item";
-                        div.textContent = item.title || item.name; // Assuming API returns 'title' for movies and 'name' for people
-                        results.append(div);
-                        div.addEventListener("click", () => {
-                            window.location.href = `/buscar?q=${encodeURIComponent(
-                                div.textContent
-                            )}`;
-                        });
+        fetch(`http://localhost:3009/api/search?q=${query}`)
+            .then((response) =>
+                response.ok ? response.json() : Promise.reject(response.statusText)
+            )
+            .then((result) => {
+                results.replaceChildren();
+                result.forEach((item) => {
+                    const div = document.createElement("div");
+                    div.className = "result-item";
+                    div.textContent = item.title || item.name;
+                    results.append(div);
+                    div.addEventListener("click", () => {
+                        window.location.href = `/buscar?q=${encodeURIComponent(
+                            div.textContent
+                        )}`;
                     });
-                })
-                .catch((error) => {
-                    console.error("Error fetching autocomplete results:", error);
-                })
-                .finally(() => {
-                    isRequestInProgress = false;
-
-                    // If there's a pending query, execute it now
-                    if (pendingQuery !== null) {
-                        const nextQuery = pendingQuery;
-                        pendingQuery = null;
-                        performSearch(nextQuery);
-                    }
                 });
-        }
+            })
+            .catch((error) => {
+                console.error("Error fetching autocomplete results:", error);
+            });
+    }
 </script>
 </body>
 </html>
