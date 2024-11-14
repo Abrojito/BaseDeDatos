@@ -109,7 +109,6 @@ app.get("/", (req, res) => {
 });
 
 // Ruta para la lista de usuarios
-// Ruta para la lista de usuarios
 app.get("/user-list", async (req, res) => {
     try {
         const users = await getAllUsers(); // Llama a la función para obtener los usuarios
@@ -168,13 +167,31 @@ app.get("/buscar", (req, res) => {
     const searchTerm = req.query.q;
 
     const query = `
-        SELECT 'movie' AS type, movie_id AS id, title AS name FROM movie WHERE title LIKE ?
-        UNION
-        SELECT 'actor' AS type, person_id AS id, person_name AS name FROM person
-        WHERE person_id IN (SELECT person_id FROM movie_cast) AND person_name LIKE ?
-        UNION
-        SELECT 'director' AS type, person_id AS id, person_name AS name FROM person
-        WHERE person_id IN (SELECT person_id FROM movie_crew WHERE job = 'Director') AND person_name LIKE ?;
+        SELECT 'movie' AS type,            -- Identifica registros como películas
+               movie_id AS id,             -- ID de la película
+               title AS name               -- Título de la película
+        FROM movie
+        WHERE title LIKE ?                 -- Filtra por título
+        UNION                              -- Combina resultados
+        SELECT 'actor' AS type,            -- Identifica registros como actores
+               person_id AS id,            -- ID del actor
+               person_name AS name         -- Nombre del actor
+        FROM person
+        WHERE person_id IN (               -- Solo personas en el elenco
+            SELECT person_id
+            FROM movie_cast)
+          AND person_name LIKE ?             -- Filtra por nombre
+        UNION                              -- Combina resultados
+        SELECT 'director' AS type,         -- Identifica registros como directores
+               person_id AS id,            -- ID del director
+               person_name AS name         -- Nombre del director
+        FROM person
+        WHERE person_id IN (               -- Solo personas con rol de director
+            SELECT person_id
+            FROM movie_crew
+            WHERE job = 'Director')
+          AND person_name LIKE ?             -- Filtra por nombre
+        ;
     `;
 
     db.all(
@@ -197,22 +214,22 @@ app.get("/pelicula/:id", (req, res) => {
     // Consulta SQL para obtener los datos de la película, elenco y crew
     const query = `
         SELECT
-            movie.*,
-            actor.person_name as actor_name,
-            actor.person_id as actor_id,
-            crew_member.person_name as crew_member_name,
-            crew_member.person_id as crew_member_id,
-            movie_cast.character_name,
-            movie_cast.cast_order,
-            department.department_name,
-            movie_crew.job
+            movie.*,                        -- Todas las columnas de la tabla 'movie'
+            actor.person_name AS actor_name, -- Nombre del actor
+            actor.person_id AS actor_id,    -- ID del actor
+            crew_member.person_name AS crew_member_name, -- Nombre del miembro del crew
+            crew_member.person_id AS crew_member_id, -- ID del miembro del crew
+            movie_cast.character_name,      -- Nombre del personaje interpretado
+            movie_cast.cast_order,          -- Orden del actor en los créditos
+            department.department_name,     -- Nombre del departamento
+            movie_crew.job                  -- Trabajo específico del miembro del crew
         FROM movie
-                 LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-                 LEFT JOIN person as actor ON movie_cast.person_id = actor.person_id
-                 LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-                 LEFT JOIN department ON movie_crew.department_id = department.department_id
-                 LEFT JOIN person as crew_member ON crew_member.person_id = movie_crew.person_id
-        WHERE movie.movie_id = ?;
+                 LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id -- Une con el elenco
+                 LEFT JOIN person AS actor ON movie_cast.person_id = actor.person_id -- Obtiene detalles del actor
+                 LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id -- Une con el crew de la película
+                 LEFT JOIN department ON movie_crew.department_id = department.department_id -- Obtiene el departamento
+                 LEFT JOIN person AS crew_member ON crew_member.person_id = movie_crew.person_id -- Detalles del miembro del crew
+        WHERE movie.movie_id = ?;           -- Filtra por ID de la película
     `;
 
     // Ejecutar la consulta
@@ -352,14 +369,15 @@ app.get("/actor/:id", (req, res) => {
 
     // Consulta SQL para obtener las películas en las que participó el actor
     const query = `
-        SELECT DISTINCT
-            person.person_name as actorName,
-            movie.*
+        SELECT DISTINCT --Evito repeticion en los resultados
+            person.person_name AS actorName, -- Nombre del actor
+            movie.*                          -- Todas las columnas de la tabla 'movie'
         FROM movie
-                 INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-                 INNER JOIN person ON person.person_id = movie_cast.person_id
-        WHERE movie_cast.person_id = ?;
+                 INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id -- Relaciona películas con el elenco
+                 INNER JOIN person ON person.person_id = movie_cast.person_id  -- Relaciona personas con el elenco
+        WHERE movie_cast.person_id = ?;       -- Filtra por ID del actor
     `;
+
 
     // Ejecutar la consulta
     db.all(query, [actorId], (err, movies) => {
@@ -381,13 +399,14 @@ app.get("/director/:id", (req, res) => {
 
     // Consulta SQL para obtener las películas dirigidas por el director
     const query = `
-        SELECT DISTINCT
-            person.person_name as directorName,
-            movie.*
+        SELECT DISTINCT --Evito repeticion
+            person.person_name AS directorName, -- Nombre del director
+            movie.*                             -- Todas las columnas de la tabla 'movie'
         FROM movie
-                 INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-                 INNER JOIN person ON person.person_id = movie_crew.person_id
-        WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
+                 INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id -- Relaciona películas con el crew
+                 INNER JOIN person ON person.person_id = movie_crew.person_id  -- Relaciona personas con el crew
+        WHERE movie_crew.job = 'Director'       -- Filtra solo por el rol de 'Director'
+          AND movie_crew.person_id = ?;         -- Filtra por ID del director
     `;
 
     // Ejecutar la consulta
@@ -439,12 +458,13 @@ app.get("/api/keyword", (req, res) => {
         res.status(400).send("Bad Request");
         return;
     }
-    const query = `SELECT * FROM movie AS m WHERE m.movie_id
-    IN (SELECT m.movie_id FROM movie AS m
-    INNER JOIN movie_keywords AS mk ON m.movie_id
-    = mk.movie_id INNER JOIN keyword AS k
-    ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
-    LIKE ?);`;
+    const query = `
+        SELECT * FROM movie AS m WHERE m.movie_id
+        IN (SELECT m.movie_id FROM movie AS m
+        INNER JOIN movie_keywords AS mk ON m.movie_id
+        = mk.movie_id INNER JOIN keyword AS k
+        ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
+        LIKE ?);`;
     db.all(query, [`%${q}%`], (err, rows) => {
         if (err) {
             console.error(err);
