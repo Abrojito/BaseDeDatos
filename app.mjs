@@ -28,6 +28,8 @@ app.use(express.static("views"));
 app.use(express.json());
 app.use(cookieParser());
 
+app.use("/user", user)
+
 // Configurar express-session para manejar sesiones de usuario
 app.use(session({
     secret: 'tu-secreto',    // Secreto para firmar las sesiones
@@ -225,6 +227,126 @@ app.get("/pelicula/:id", (req, res) => {
             res.render("pelicula", { movie: movieData, user: { id: userId } });
         }
     });
+});
+
+// Ruta para mostrar la página de un actor específico
+app.get("/actor/:id", (req, res) => {
+    const actorId = req.params.id;
+
+    // Consulta SQL para obtener las películas en las que participó el actor
+    const query = `
+        SELECT DISTINCT
+            person.person_name as actorName,
+            movie.*
+        FROM movie
+                 INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+                 INNER JOIN person ON person.person_id = movie_cast.person_id
+        WHERE movie_cast.person_id = ?;
+    `;
+
+    // Ejecutar la consulta
+    db.all(query, [actorId], (err, movies) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error al cargar las películas del actor.");
+        } else {
+            // Obtener el nombre del actor
+            const actorName = movies.length > 0 ? movies[0].actorName : "";
+
+            res.render("actor", { actorName, movies });
+        }
+    });
+});
+
+// Ruta para mostrar la página de un director específico
+app.get("/director/:id", (req, res) => {
+    const directorId = req.params.id;
+
+    // Consulta SQL para obtener las películas dirigidas por el director
+    const query = `
+        SELECT DISTINCT
+            person.person_name as directorName,
+            movie.*
+        FROM movie
+                 INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+                 INNER JOIN person ON person.person_id = movie_crew.person_id
+        WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
+    `;
+
+    // Ejecutar la consulta
+    db.all(query, [directorId], (err, movies) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error al cargar las películas del director.");
+        } else {
+            // Obtener el nombre del director
+            const directorName = movies.length > 0 ? movies[0].directorName : "";
+            res.render("director", { directorName, movies });
+        }
+    });
+});
+
+// Ruta para buscar por palabras clave
+app.get("/keyword", (req, res) => {
+    res.render("search_keyword");
+});
+
+// Funcion para autocompletar la búsqueda
+app.get("/api/autocomplete", (req, res) => {
+    const { q } = req.query;
+    if (q == undefined) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const query = `SELECT k.keyword_name FROM keyword AS k
+    WHERE k.keyword_name LIKE ? ORDER BY k.keyword_name LIMIT 10;`;
+    db.all(query, [`%${q}%`], (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        res.status(200).send(rows);
+    });
+});
+
+// Ruta para visualizar los resultados de la búsqueda por palabras clave
+app.get("/keyword/:q", (req, res) => {
+    res.status(200).render("resultados_keyword.ejs");
+});
+
+// Funcion para buscar por palabras clave
+app.get("/api/keyword", (req, res) => {
+    const { q } = req.query;
+    if (q == undefined) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const query = `SELECT * FROM movie AS m WHERE m.movie_id
+    IN (SELECT m.movie_id FROM movie AS m
+    INNER JOIN movie_keywords AS mk ON m.movie_id
+    = mk.movie_id INNER JOIN keyword AS k
+    ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
+    LIKE ?);`;
+    db.all(query, [`%${q}%`], (err, rows) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        res.status(200).send(rows);
+    });
+});
+
+app.get("/api/search", async (req, res) => {
+    const { q } = req.query;
+    console.log("Searching for: ", q);
+    if (!q) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const results = await Promise.all([searchMovies(q), searchPeople(q)]);
+    return res.send([...results[0], ...results[1]]);
 });
 
 // Puerto de escucha
