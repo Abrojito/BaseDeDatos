@@ -1,0 +1,162 @@
+<!-- views/admin.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Panel de Administración</title>
+    <style>
+        /* Estilos para el panel de administración */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .add-user-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .add-user-btn:hover {
+            background-color: #218838;
+        }
+
+        .action-buttons button {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Panel de Administración</h1>
+
+    <!-- Botón para agregar usuario -->
+    <a href="/user/add" class="add-user-btn">Agregar Usuario</a>
+
+    <!-- Tabla de usuarios -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre de Usuario</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user=> { %>
+                <tr>
+                    <td>
+                        <%= user.user_id %>
+                    </td>
+                    <td>
+                        <%= user.user_username %>
+                    </td>
+                    <td>
+                        <%= user.user_name %>
+                    </td>
+                    <td>
+                        <%= user.user_email %>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="edit-btn" onclick="location.href='/user/edit/<%= user.user_id %>'">
+                            Editar
+                        </button>
+                        <button class="delete-btn" onclick="deleteUser('<%= user.user_id %>')">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <script>
+        async function deleteUser(userId) {
+            console.log("here");
+            console.log(userId);
+            if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+                try {
+                    fetch(`http://localhost:3009/user/${userId}`, {
+                        method: "DELETE",
+                    }).then((response) => {
+                        if (response.ok) {
+                            location.reload(); // Recarga la página para reflejar los cambios
+                        } else {
+                            response.text().then((errorText) => {
+                                alert(errorText || "Error al eliminar el usuario");
+                            });
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error al eliminar el usuario");
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -4,12 +4,12 @@ import { user } from "./user.mjs";
 import cookieParser from "cookie-parser";
 import profile from "./profile.mjs";
 import reviews from "./reviews.mjs";
-import userRoutes from './userRoutes.mjs';  // Asegúrate de importar las rutas
+import userRoutes from "./userRoutes.mjs"; // Asegúrate de importar las rutas
 import { searchMovies, searchPeople } from "./search.js";
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { fileURLToPath } from "url";
+import path from "path";
 import { getAllUsers } from "./userService.mjs";
-import session from 'express-session';  // Importar express-session
+import session from "express-session"; // Importar express-session
 
 const { Database } = pkg;
 const app = express();
@@ -28,21 +28,61 @@ app.use(express.static("views"));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/user", user)
+app.use("/user", user);
 
 // Configurar express-session para manejar sesiones de usuario
-app.use(session({
-    secret: 'tu-secreto',    // Secreto para firmar las sesiones
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Usa secure: true en producción con HTTPS
-}));
+app.use(
+    session({
+        secret: "tu-secreto", // Secreto para firmar las sesiones
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false }, // Usa secure: true en producción con HTTPS
+    })
+);
 
 // Conectar a la base de datos
 const db = new Database("./movies.db");
 
+// Ruta para la lista de usuarios (Admin Screen)
+app.get("/user-list", (req, res) => {
+    const userId = req.cookies?.user_id;
+    if (!userId) {
+        // Si no hay usuario autenticado, redirige al login
+        return res.redirect("/login");
+    }
+
+    // Consulta para obtener el email del usuario actual
+    const query = "SELECT * FROM user WHERE user_id = ?";
+    db.get(query, [userId], (err, user) => {
+        if (err) {
+            console.error("Error al obtener el usuario:", err);
+            return res.status(500).send("Error al obtener el usuario");
+        }
+        if (!user) {
+            // Si el usuario no existe, redirige al login
+            return res.redirect("/login");
+        }
+
+        if (user.user_email === "violeta@gmail.com") {
+            // Si es el admin, obtenemos la lista de usuarios
+            getAllUsers()
+                .then((users) => {
+                    console.log(users);
+                    res.render("admin", { users });
+                })
+                .catch((error) => {
+                    console.error("Error al cargar la lista de usuarios:", error);
+                    res.status(500).send("Error al cargar la lista de usuarios");
+                });
+        } else {
+            // Si no es el admin, redirige al inicio
+            res.redirect("/");
+        }
+    });
+});
+
 // Rutas
-app.use('/user', userRoutes);  // Ruta de usuarios
+app.use("/user", userRoutes); // Ruta de usuarios
 app.use("/perfil", profile);
 app.use("/movies", reviews); // Usa las rutas de reseñas
 
@@ -71,21 +111,18 @@ app.get("/", (req, res) => {
 
 // Ruta para la lista de usuarios
 // Ruta para la lista de usuarios
-app.get('/user-list', async (req, res) => {
+app.get("/user-list", async (req, res) => {
     try {
-        const users = await getAllUsers();  // Llama a la función para obtener los usuarios
-        const currentUserRole = req.session.user_role;  // Obtén el rol del usuario actual desde la sesión
+        const users = await getAllUsers(); // Llama a la función para obtener los usuarios
+        const currentUserRole = req.session.user_role; // Obtén el rol del usuario actual desde la sesión
 
         // Ahora la verificación de rol se elimina, cualquier usuario puede ver la lista de usuarios
-        res.render('user-list', { users, currentUserRole });  // Pasa los datos a la vista
+        res.render("user-list", { users, currentUserRole }); // Pasa los datos a la vista
     } catch (error) {
-        console.error('Error al cargar la lista de usuarios:', error);  // Muestra el error en los logs
-        res.status(500).send('Error al cargar la lista de usuarios');
+        console.error("Error al cargar la lista de usuarios:", error); // Muestra el error en los logs
+        res.status(500).send("Error al cargar la lista de usuarios");
     }
 });
-
-
-
 
 // Ruta para mostrar el formulario de login
 app.get("/login", (req, res) => {
@@ -105,7 +142,7 @@ app.post("/login", (req, res) => {
         }
         if (row) {
             // Guardar el rol en la sesión
-            req.session.user_role = row.user_role;  // Asumiendo que 'user_role' está en la base de datos
+            req.session.user_role = row.user_role; // Asumiendo que 'user_role' está en la base de datos
 
             res.cookie("user_id", row.user_id);
             res.redirect("/"); // Redirigir al home o donde quieras

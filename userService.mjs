@@ -5,34 +5,17 @@ const { Database } = pkg;
 const db = new Database("./movies.db");
 
 // Función para obtener todos los usuarios
-export const getAllUsers = async () => {
-    try {
-        const query = `
-            SELECT
-                user_id,
-                user_username,
-                user_email,
-                user_role
-            FROM user
-        `;
-        console.log("Ejecutando la consulta para obtener los usuarios...");
-        const users = await new Promise((resolve, reject) => {
-            db.all(query, [], (err, users) => {
-                if (err) {
-                    console.error("Error en la consulta a la base de datos:", err);
-                    reject(err);
-                    return;
-                }
-                resolve(users);
-            });
+export function getAllUsers() {
+    return new Promise((resolve, reject) => {
+        const query = "SELECT * FROM user";
+        db.all(query, [], (err, rows) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(rows);
         });
-        console.log("Usuarios obtenidos:", users);
-        return users;
-    } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
-        throw error;
-    }
-};
+    });
+}
 
 // Función para obtener un usuario por su ID
 export const getUserById = async (userId) => {
@@ -65,7 +48,7 @@ export const getUserById = async (userId) => {
 // Función para crear un nuevo usuario
 export const createUser = async (userData) => {
     try {
-        const { username, email, password, role = 'user' } = userData;
+        const { username, email, password, role = "user" } = userData;
 
         // Verificar si el correo electrónico ya existe
         const queryCheck = `SELECT COUNT(*) as count FROM user WHERE user_email = ?`;
@@ -80,7 +63,7 @@ export const createUser = async (userData) => {
         });
 
         if (existingEmail > 0) {
-            throw new Error('Este correo electrónico ya está en uso');
+            throw new Error("Este correo electrónico ya está en uso");
         }
 
         const query = `
@@ -92,7 +75,7 @@ export const createUser = async (userData) => {
             ) VALUES (?, ?, ?, ?)
         `;
         const userId = await new Promise((resolve, reject) => {
-            db.run(query, [username, email, password, role], function(err) {
+            db.run(query, [username, email, password, role], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -120,7 +103,7 @@ export const updateUser = async (userId, userData) => {
             WHERE user_id = ?
         `;
         const changes = await new Promise((resolve, reject) => {
-            db.run(query, [username, email, role, userId], function(err) {
+            db.run(query, [username, email, role, userId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -140,7 +123,7 @@ export const deleteUser = async (userId) => {
     try {
         const query = "DELETE FROM user WHERE user_id = ?";
         const changes = await new Promise((resolve, reject) => {
-            db.run(query, [userId], function(err) {
+            db.run(query, [userId], function (err) {
                 if (err) {
                     reject(err);
                     return;

@@ -1,6 +1,6 @@
 import express from "express";
 import pkg from "sqlite3";
-import {getMovieUserList, } from "./profile.mjs";
+import { getMovieUserList } from "./profile.mjs";
 const { Database } = pkg;
 const db = new Database("./movies.db");
 
@@ -49,7 +49,6 @@ user.get("/profile", async (req, res) => {
     }
 });
 
-
 // Registrar nuevo usuario (con email y contraseña)
 user.post("/register", (req, res) => {
     const { username, name, email, password } = req.body;
@@ -63,17 +62,58 @@ user.post("/register", (req, res) => {
 
         if (row) {
             // Si el usuario ya existe, renderizamos la vista de "usuario ya registrado"
-            return res.render("alreadyregistered", { message: `User ${username} is already registered` });
+            return res.render("alreadyregistered", {
+                message: `User ${username} is already registered`,
+            });
         }
 
         // Insertar nuevo usuario en la base de datos
-        const insertQuery = "INSERT INTO user (user_username, user_name, user_email, user_password) VALUES (?, ?, ?, ?)";
+        const insertQuery =
+            "INSERT INTO user (user_username, user_name, user_email, user_password) VALUES (?, ?, ?, ?)";
         db.run(insertQuery, [username, name, email, password], (error) => {
             if (error) {
                 return res.status(500).send(error.message);
             }
-            res.status(200).render('success', { message: `User ${username} has been created successfully!` });
+            res.status(200).render("success", {
+                message: `User ${username} has been created successfully!`,
+            });
         });
+    });
+});
+
+// Ruta para eliminar usuario (solo admin)
+user.delete("/:id", (req, res) => {
+    const userId = req.cookies?.user_id;
+    if (!userId) {
+        return res.redirect("/login");
+    }
+
+    // Consulta para obtener el email del usuario actual
+    const query = "SELECT * FROM user WHERE user_id = ?";
+    db.get(query, [userId], (err, userData) => {
+        if (err) {
+            console.error("Error al obtener el usuario:", err);
+            return res.status(500).send("Error al obtener el usuario");
+        }
+        if (!userData) {
+            // Si el usuario no existe, redirige al login
+            return res.redirect("/login");
+        }
+
+        if (userData.user_email === "violeta@gmail.com") {
+            // Si es el admin, procede a eliminar el usuario
+            const { id } = req.params;
+            const deleteQuery = "DELETE FROM user WHERE user_id = ?";
+            db.run(deleteQuery, [id], (error) => {
+                if (error) {
+                    return res.status(500).send(error.message);
+                }
+                res.status(200).send(`El usuario con id ${id} ha sido borrado`);
+            });
+        } else {
+            // Si no es el admin, redirige al inicio
+            res.redirect("/");
+        }
     });
 });
 
@@ -82,7 +122,8 @@ user.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     // Consulta para verificar al usuario en la BD
-    const query = "SELECT * FROM user WHERE user_username = ? AND user_password = ?";
+    const query =
+        "SELECT * FROM user WHERE user_username = ? AND user_password = ?";
 
     db.get(query, [username, password], (err, row) => {
         if (err) {
@@ -91,8 +132,8 @@ user.post("/login", (req, res) => {
         }
         if (row) {
             // Si el usuario es válido, puedes establecer la cookie y redirigir
-            res.cookie('user_id', row.user_id); // Si usas cookies
-            res.redirect('/'); // Redirigir al home o a donde desees
+            res.cookie("user_id", row.user_id); // Si usas cookies
+            res.redirect("/"); // Redirigir al home o a donde desees
         } else {
             res.status(401).send("Usuario o contraseña incorrectos.");
         }
@@ -103,7 +144,8 @@ user.post("/login", (req, res) => {
 user.put("/:id", (req, res) => {
     const { id } = req.params;
     const { username, name, email } = req.body;
-    const query = "UPDATE user SET user_username = ?, user_name = ?, user_email = ? WHERE user_id = ?";
+    const query =
+        "UPDATE user SET user_username = ?, user_name = ?, user_email = ? WHERE user_id = ?";
     db.run(query, [username, name, email, id], (error) => {
         if (error) {
             return res.status(500).send(error.message);
@@ -125,4 +167,3 @@ user.delete("/:id", (req, res) => {
 });
 
 export { user };
-

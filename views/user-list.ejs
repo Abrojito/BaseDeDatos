@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,51 +116,55 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <h1>Usuarios</h1>
+    <div class="container">
+        <h1>Usuarios</h1>
 
-    <% if (currentUserRole === 'admin') { %>
-        <!-- Botón de administración para agregar usuario solo visible para admins -->
-        <a href="/user/add" class="add-user-btn">Agregar usuario</a>
-    <% } %>
+        <% if (currentUserRole==='admin' ) { %>
+            <!-- Botón de administración para agregar usuario solo visible para admins -->
+            <a href="/user/add" class="add-user-btn">Agregar usuario</a>
+            <% } %>
 
-    <div class="user-selection">
-        <% users.forEach((user) => { %>
-            <div class="user-card">
-                <p><%= user.user_username %> (<%= user.user_email %>)</p>
+                <div class="user-selection">
+                    <% users.forEach((user)=> { %>
+                        <div class="user-card">
+                            <p>
+                                <%= user.user_username %> (<%= user.user_email %>)
+                            </p>
 
-                <!-- Los botones de editar y eliminar solo son visibles para los administradores -->
-                <% if (currentUserRole === 'admin') { %>
-                    <button onclick="location.href='/user/edit/<%= user.user_id %>'">Editar</button>
-                    <button onclick="deleteUser(<%= user.user_id %>)">Eliminar</button>
-                <% } %>
-            </div>
-        <% }) %>
+                            <!-- Los botones de editar y eliminar solo son visibles para los administradores -->
+                            <% if (currentUserRole==='admin' ) { %>
+                                <button onclick="location.href='/user/edit/<%= user.user_id %>'">Editar</button>
+                                <button onclick="deleteUser(<%= user.user_id %>)">Eliminar</button>
+                                <% } %>
+                        </div>
+                        <% }) %>
+                </div>
     </div>
-</div>
 
-<script>
-    async function deleteUser(userId) {
-        if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-            try {
-                const response = await fetch(`/user/${userId}`, {
-                    method: 'DELETE'
-                });
+    <script>
+        async function deleteUser(userId) {
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                try {
+                    const response = await fetch(`http://localhost:3009/user/${userId}`, {
+                        method: 'DELETE'
+                    });
 
-                if (response.ok) {
-                    location.reload(); // Recarga la página para reflejar los cambios
-                } else {
-                    const errorText = await response.text();
-                    alert(errorText || 'Error al eliminar el usuario');
+                    if (response.ok) {
+                        location.reload(); // Recarga la página para reflejar los cambios
+                    } else {
+                        const errorText = await response.text();
+                        alert(errorText || 'Error al eliminar el usuario');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el usuario');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al eliminar el usuario');
             }
         }
-    }
-</script>
+    </script>
 
 </body>
+
 </html>
