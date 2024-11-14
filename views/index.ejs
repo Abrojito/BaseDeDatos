@@ -240,55 +240,5 @@
 <div class="playlist-button">
     <button onclick="window.location.href='/favoritos'">My list</button>
 </div>
-
-<script>
-    const form = document.getElementById("form");
-    const input = document.getElementById("input");
-    const results = document.getElementById("results");
-    const keywordSearchBtn = document.getElementById("keyword-search-btn");
-
-    form.addEventListener("submit", (ev) => {
-        ev.preventDefault();
-        window.location.href = `/buscar?q=${encodeURIComponent(input.value)}`;
-    });
-
-    keywordSearchBtn.addEventListener("click", () => {
-        window.location.href = `/keyword`;
-    });
-
-    input.addEventListener("input", (ev) => {
-        const query = input.value;
-        if (query.length === 0) {
-            results.replaceChildren();
-            return;
-        }
-
-        performSearch(query);
-    });
-
-    function performSearch(query) {
-        fetch(`http://localhost:3009/api/search?q=${query}`)
-            .then((response) =>
-                response.ok ? response.json() : Promise.reject(response.statusText)
-            )
-            .then((result) => {
-                results.replaceChildren();
-                result.forEach((item) => {
-                    const div = document.createElement("div");
-                    div.className = "result-item";
-                    div.textContent = item.title || item.name;
-                    results.append(div);
-                    div.addEventListener("click", () => {
-                        window.location.href = `/buscar?q=${encodeURIComponent(
-                            div.textContent
-                        )}`;
-                    });
-                });
-            })
-            .catch((error) => {
-                console.error("Error fetching autocomplete results:", error);
-            });
-    }
-</script>
 </body>
 </html>

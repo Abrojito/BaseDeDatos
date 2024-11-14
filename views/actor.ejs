@@ -1,66 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/add-user.css">
-    <title>Agregar Usuario</title>
+    <title>Películas con <%= actorName %>
+    </title>
+    <link rel="stylesheet" href="/styles/resultado.css" />
 </head>
 
 <body>
+<div class="aura-background"></div>
     <div class="container">
-        <h1>Agregar usuario</h1>
-        <form id="form" class="add-user-form">
-            <div class="form-group">
-                <label for="username">Nombre de usuario</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="name">Nombre</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="submit-btn">Agregar</button>
-        </form>
+        <h1 class="title">Películas con <%= actorName %>
+        </h1>
+        <ul class="result-list">
+            <% movies.sort((a, b)=> new Date(b.release_date) - new
+                Date(a.release_date)).forEach((movie) => { %>
+                <li>
+                    <a href="/pelicula/<%= movie.movie_id %>">
+                        <%= movie.title %> (<%= new Date(movie.release_date).getFullYear() %>)
+                    </a>
+                </li>
+                <% }); %>
+        </ul>
+        <div id="inicio"><a href="/">Inicio</a></div>
     </div>
-    <script>
-        const username = document.getElementById("username")
-        const name = document.getElementById("name")
-        const email = document.getElementById("email")
-        const password = document.getElementById("password")
-        const form = document.getElementById("form")
-
-        form.addEventListener("submit", (e) => {
-            e.preventDefault()
-            const body = {
-                username: username.value,
-                name: name.value,
-                email: email.value,
-            }
-
-
-            fetch("/user", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body),
-            })
-                .then((response) => response.text().then((result) => {
-                    alert(result)
-                    location.href = "/"
-                }))
-                .catch((error) => alert(error))
-        })
-    </script>
 </body>
 
 </html>
