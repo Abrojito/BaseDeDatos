@@ -10,8 +10,8 @@
 <div class="aura-background"></div>
 <div class="main-content">
     <h1 class="title">MovieWeb</h1>
-    <form action="/buscar-palabras-clave" method="GET" class="search-form" id="form">
-        <input type="text" name="keywords" placeholder="Search by keyword..." id="input" autocomplete="off" />
+    <form action="/buscar" method="GET" class="search-form" id="form">
+        <input type="text" name="q" placeholder="Search by keyword..." id="input" autocomplete="off" />
         <button type="button" id="search-btn">Search</button>
     </form>
     <div id="results"></div>
@@ -25,46 +25,31 @@
     const input = document.getElementById("input");
     const results = document.getElementById("results");
     let selectedIndex = -1;
-
-    // Cambiar la ruta del formulario para redirigir a la página correcta
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
-        realizarBusqueda();
+        window.location.href = `/buscar?q=${encodeURIComponent(input.value)}`;
     });
-
-    // Función para manejar la búsqueda al hacer clic en el botón o presionar Enter
-    function realizarBusqueda() {
-        const query = input.value.trim();
-        if (query) {
-            window.location.href = `/buscar-palabras-clave?keywords=${encodeURIComponent(query)}`;
-        }
-    }
-
-    // Llamada de autocompletar al escribir en el input
+    // Autocompletar: cada vez que se escribe en el input
     input.addEventListener("input", () => {
         if (input.value.length === 0) {
-            results.innerHTML = "";  // Limpiar resultados si el input está vacío
+            results.replaceChildren();  // Limpiar resultados si el input está vacío
             return;
         }
-
-        // Llamada a la API para autocompletar
+    // Llamada a la API para autocompletar
         fetch(`/api/autocomplete?q=${encodeURIComponent(input.value)}`)
             .then(response => response.json())
             .then(result => {
-                results.innerHTML = "";  // Limpiar resultados anteriores
+                results.replaceChildren();  // Limpiar resultados anteriores
                 selectedIndex = -1;  // Reiniciar el índice seleccionado
                 result.forEach((keyword, index) => {
                     const div = document.createElement("div");
                     div.className = "result-item";
                     div.textContent = keyword.keyword_name;
                     div.dataset.index = index;
-
-                    // Redireccionar a la página de resultados al hacer clic en el resultado
+                    // Redireccionar a la página de resultados al hacer clic
                     div.addEventListener("click", () => {
-                        input.value = keyword.keyword_name;
-                        realizarBusqueda();  // Ejecutar búsqueda con el valor seleccionado
+                        window.location.href = `/buscar?q=${encodeURIComponent(keyword.keyword_name)}`;
                     });
-
                     results.appendChild(div);
                 });
             })
@@ -72,8 +57,7 @@
                 console.error("Error al obtener las sugerencias de búsqueda:", error);
             });
     });
-
-    // Manejo de las teclas de flecha para navegar por el autocompletado
+    // Manejo de las teclas de flecha
     input.addEventListener("keydown", (ev) => {
         const items = Array.from(results.children);
         if (ev.key === "ArrowDown") {
@@ -90,13 +74,10 @@
             updateSelection(items);
         } else if (ev.key === "Enter" && selectedIndex >= 0) {
             ev.preventDefault();
-            items[selectedIndex].click();  // Ejecutar clic en la sugerencia seleccionada
-        } else if (ev.key === "Enter") {
-            realizarBusqueda();  // Ejecutar búsqueda si no hay una sugerencia seleccionada
+            items[selectedIndex].click();  // Redirigir al hacer Enter sobre la sugerencia seleccionada
         }
     });
-
-    // Función para resaltar el elemento seleccionado en autocompletado
+    // Función para resaltar el elemento seleccionado
     function updateSelection(items) {
         items.forEach((item, index) => {
             item.classList.toggle("selected", index === selectedIndex);
@@ -105,10 +86,11 @@
             }
         });
     }
-
-    // Manejo del botón de búsqueda
     document.getElementById("search-btn").addEventListener("click", () => {
-        realizarBusqueda();
+        const query = input.value;
+        if (query) {
+            window.location.href = `/buscar?q=${encodeURIComponent(query)}`;
+        }
     });
 </script>
 </body>

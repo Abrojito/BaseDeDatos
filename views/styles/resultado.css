@@ -1,209 +1,147 @@
-/* Fondo con gradientes */
-body,
-html {
+/* Existing styles */
+body {
+    background-color: #ffccff;
+    background-image: url("/images/2000s-background.gif");
+    background-repeat: repeat;
+    color: #330033;
+    font-family: "Comic Sans MS", cursive, sans-serif;
     margin: 0;
     padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    position: relative;
-    width: 100%;
 }
 
-.aura-background {
-    position: fixed; /* Cambié a fixed para que cubra toda la pantalla */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-            circle at 20% 20%,
-            rgba(255, 82, 82, 0.6),
-            transparent 60%
-    ),
-    radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
-    radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
-    filter: blur(80px);
-    z-index: -1; /* Asegura que el fondo esté detrás */
-    pointer-events: none; /* Para evitar que el fondo interfiera con los clics */
-}
-
-/* Contenedor blanco translúcido con borde rosa pastel */
 .container {
-    background-color: rgba(210, 212, 211, 0.4); /* Blanco más translúcido */
-    border: 2px solid rgba(255, 182, 193, 0.8); /* Rosa pastel */
-    border-radius: 10px; /* Borde redondeado */
-    padding: 20px; /* Espaciado interno */
-    max-width: 1200px; /* Ancho máximo */
-    margin: auto; /* Centrado */
-    position: relative; /* Para que se coloque encima del fondo */
-    z-index: 1;
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 204, 255, 0.9);
+    border: 5px double #ff66ff;
+    box-shadow: 0 0 10px #ff99ff;
 }
 
-/* Títulos en blanco */
-h1.title,
-h3 {
-    color: white; /* Títulos en blanco */
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+.title {
+    text-align: center;
+    font-size: 48px;
+    color: #ff00ff;
+    text-shadow: 2px 2px #ff99ff;
+    margin-bottom: 30px;
 }
 
-/* Botón para agregar a favoritos */
-.button-add-favorites {
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background 0.3s ease;
+.section-title {
+    font-size: 32px;
+    color: #cc00cc;
+    border-bottom: 2px dotted #ff33cc;
+    margin-top: 40px;
 }
 
-.button-add-favorites:hover {
-    background-color: #0056b3;
-}
-
-/* Listas de información */
-ul.result-list {
+.result-list {
     list-style-type: none;
-    padding: 0;
-    margin: 0;
-    text-align: left;
-}
-
-ul.result-list li {
-    margin: 10px 0;
-}
-
-/* Enlaces de los directores, actores y otros miembros */
-ul.result-list a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-ul.result-list a:hover {
-    text-decoration: underline;
-}
-
-/* Formulario de reseña */
-#reviewForm {
-    margin-top: 30px;
-    text-align: left;
-}
-
-#reviewForm input[type="number"],
-#reviewForm textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-}
-
-#reviewForm textarea {
-    height: 150px;
-    resize: vertical;
-}
-
-#reviewForm button {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-#reviewForm button:hover {
-    background-color: #218838;
-}
-
-/* Estilos para el modal de reseña */
-.modal-content {
-    border-radius: 8px;
-}
-
-.modal-header, .modal-footer {
-    border-bottom: 1px solid #ccc;
-    padding: 15px;
-}
-
-.modal-title {
-    font-size: 1.5rem;
-}
-
-.modal-body {
-    font-size: 1rem;
-    padding: 20px;
-}
-
-.btn-secondary, .btn-primary {
-    padding: 10px 20px;
-    border-radius: 25px;
-}
-
-/* General de texto */
-h3 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-top: 20px;
-}
-
-/* Estilos para las secciones de información */
-#overview p {
-    font-size: 1.1rem;
-    color: #555;
-    text-align: justify;
-    margin-top: 10px;
-}
-
-/* Ajustes de márgenes y padding generales */
-.container > h3, .result-list {
-    margin-top: 10px;
-}
-
-.container {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.container > h1, .container > h3 {
-    color: #333;
+    padding-left: 20px;
 }
 
 .result-list li {
-    font-size: 1.1rem;
-    color: #555;
-    line-height: 1.6;
+    background-image: url("/images/bullet.gif");
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    padding-left: 20px;
+    line-height: 20px;
 }
 
-/* Asegurarse de que el botón de agregar a favoritos esté alineado de forma adecuada */
+.result-list li a {
+    text-decoration: none;
+    color: #990066;
+    font-weight: bold;
+}
+
+.result-list li a:hover {
+    color: #ff00ff;
+    text-decoration: underline;
+}
+
+#inicio {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#inicio a {
+    text-decoration: none;
+    color: #cc0066;
+    font-size: 24px;
+    background-color: #ff99cc;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #ff66cc;
+}
+
+#inicio a:hover {
+    background-color: #ff66cc;
+    color: #ffffff;
+}
+
+/* New styles for the review form */
+form#reviewForm {
+    background-color: #ffe6f9;
+    border: 3px solid #ff66cc;
+    border-radius: 15px;
+    padding: 20px;
+    width: 80%;
+    margin: 30px auto;
+    box-shadow: 0 0 8px #ff99ff;
+    text-align: center;
+}
+
+form#reviewForm input[type="number"],
+form#reviewForm textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #ff66cc;
+    border-radius: 10px;
+    background-color: #ffccff;
+    color: #330033;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+form#reviewForm input[type="number"]:focus,
+form#reviewForm textarea:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 5px #ff99ff;
+}
+
+form#reviewForm button {
+    background-color: #ff66cc;
+    border: 2px solid #ff33cc;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+form#reviewForm button:hover {
+    background-color: #ff00ff;
+    color: #ffffff;
+}
+
+/* New styles for the "Add to Favorites" button */
 .button-add-favorites {
-    margin-top: 20px;
+    background-color: #ff99cc;
+    border: 2px solid #ff66cc;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    display: block;
+    margin: 0 auto;
 }
 
-/* Responsividad */
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-
-    h1.title {
-        font-size: 2rem;
-    }
-
-    #reviewForm input[type="number"],
-    #reviewForm textarea {
-        font-size: 0.9rem;
-    }
+.button-add-favorites:hover {
+    background-color: #ff00ff;
+    color: #ffffff;
+    border-color: #ff33cc;
 }
