@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/users.css">
+    <title>Usuarios</title>
+</head>
+<body>
+<div class="container">
+    <h1>Usuarios</h1>
+
+    <% if (currentUserRole === 'admin') { %>
+        <!-- Botón de administración para agregar usuario solo visible para admins -->
+        <a href="/user/add" class="add-user-btn">Agregar usuario</a>
+    <% } else { %>
+        <p>No tienes permisos para agregar usuarios.</p>
+    <% } %>
+
+    <div class="user-selection">
+        <% users.forEach((user) => { %>
+            <div class="user-card">
+                <p><%= user.username %> (<%= user.email %>)</p>
+                <% if (currentUserRole === 'admin') { %>
+                    <!-- Solo los admins ven el botón de editar -->
+                    <button onclick="location.href='/user/edit/<%= user.id %>'">Editar</button>
+                <% } %>
+            </div>
+        <% }) %>
+    </div>
+</div>
+</body>
+</html>

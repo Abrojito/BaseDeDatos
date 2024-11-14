@@ -13,8 +13,9 @@
     <!-- Información del usuario -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Información Personal</h2>
-        <p>Usuario: <%= user.username %></p>
-        <p>Email: <%= user.email %></p>
+        <!-- Asegúrate de que 'user.username' y 'user.email' sean correctos -->
+        <p><strong>Usuario:</strong> <%= user.user_username %></p> <!-- Nombre de usuario -->
+        <p><strong>Email:</strong> <%= user.user_email %></p> <!-- Correo electrónico -->
     </div>
 
     <!-- Películas calificadas y reseñadas -->
@@ -33,7 +34,7 @@
                             <div class="mb-2">
                                 <span class="font-medium">Puntuación:</span>
                                 <span class="ml-2">
-                                    <% for(let i = 0; i < 5; i++) { %>
+                                    <% for (let i = 0; i < 5; i++) { %>
                                         <% if (i < item.rating) { %>
                                             ⭐
                                         <% } else { %>
@@ -42,8 +43,8 @@
                                     <% } %>
                                 </span>
                                 <span class="text-sm text-gray-500 ml-2">
-                                        (<%= new Date(item.rating_date).toLocaleDateString() %>)
-                                    </span>
+                                    (<%= new Date(item.rating_date).toLocaleDateString() %>)
+                                </span>
                             </div>
                         <% } %>
 
@@ -52,20 +53,16 @@
                                 <span class="font-medium">Reseña:</span>
                                 <p class="mt-1 text-gray-700"><%= item.review %></p>
                                 <span class="text-sm text-gray-500">
-                                        (<%= new Date(item.review_date).toLocaleDateString() %>)
-                                    </span>
+                                    (<%= new Date(item.review_date).toLocaleDateString() %>)
+                                </span>
                             </div>
                         <% } %>
 
                         <div class="mt-2 space-x-2">
-                            <button
-                                    onclick="editRating('<%= item.movie_id %>')"
-                                    class="text-blue-600 text-sm hover:text-blue-800">
+                            <button onclick="editRating('<%= item.movie_id %>')" class="text-blue-600 text-sm hover:text-blue-800">
                                 Editar puntuación
                             </button>
-                            <button
-                                    onclick="editReview('<%= item.movie_id %>')"
-                                    class="text-blue-600 text-sm hover:text-blue-800">
+                            <button onclick="editReview('<%= item.movie_id %>')" class="text-blue-600 text-sm hover:text-blue-800">
                                 Editar reseña
                             </button>
                         </div>

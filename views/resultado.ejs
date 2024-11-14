@@ -2,20 +2,20 @@
 <html>
 
 <head>
-    <title>Resultado de la Búsqueda</title>
+    <title>Search results</title>
     <link rel="stylesheet" href="styles/resultado.css" />
 </head>
 
 <body>
 <div class="aura-background"></div>
     <div class="container">
-        <h1 class="title">Resultado de la Búsqueda</h1>
+        <h1 class="title">Search results</h1>
 
         <% if (results.length===0) { %>
-            <p>No hay resultados.</p>
+            <p>No results.</p>
             <% } else { %>
 
-                <h2 class="section-title">🎬 Películas</h2>
+                <h2 class="section-title">🎬 Movies</h2>
                 <ul class="result-list">
                     <% let foundMovies=false; %>
                         <% results.forEach((result)=> { %> <% if (result.type==='movie' ) { %>
@@ -27,12 +27,12 @@
                                         <% }); %>
                                             <% if (!foundMovies) { %>
                                                 <li>
-                                                    No se han encontrado películas asociadas a la búsqueda ingresada.
+                                                    No movies found.
                                                 </li>
                                                 <% } %>
                 </ul>
 
-                <h2 class="section-title">🎭 Actores</h2>
+                <h2 class="section-title">🎭 Actors</h2>
                 <ul class="result-list">
                     <% let foundActors=false; %>
                         <% results.forEach((result)=> { %> <% if (result.type==='actor' ) { %>
@@ -43,11 +43,11 @@
                                     <% } %>
                                         <% }); %>
                                             <% if (!foundActors) { %>
-                                                <li>No se han encontrado actores asociados a la búsqueda ingresada.</li>
+                                                <li>No actors found.</li>
                                                 <% } %>
                 </ul>
 
-                <h2 class="section-title">🎥 Directores</h2>
+                <h2 class="section-title">🎥 Directors</h2>
                 <ul class="result-list">
                     <% let foundDirectors=false; %>
                         <% results.forEach((result)=> { %> <% if (result.type==='director' ) { %>
@@ -59,15 +59,14 @@
                                         <% }); %>
                                             <% if (!foundDirectors) { %>
                                                 <li>
-                                                    No se han encontrado directores asociados a la búsqueda ingresada.
+                                                    No directors found.
                                                 </li>
                                                 <% } %>
                 </ul>
 
                 <% } %>
 
-                    <div id="inicio"><a href="/">Inicio</a></div>
+        <div id="inicio"><a href="/">Home</a></div>
     </div>
 </body>
-
 </html>

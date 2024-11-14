@@ -23,9 +23,55 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from the "views" directory
 app.use(express.static("views"));
 
+
+
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(cookieParser());
+
+// Establecer EJS como motor de plantillas
+app.set('view engine', 'ejs');   // Esto le dice a Express que use EJS como motor de plantillas
+app.set('views', path.join(__dirname, 'views')); // Carpeta donde están tus vistas
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const users = [
+        { id: 1, username: 'Juan', email: 'juan@correo.com' },
+        { id: 2, username: 'Ana', email: 'ana@correo.com' },
+    ];
+    const currentUserRole = 'admin'; // Cambia esto según el rol de tu usuario
+    res.render('user_list', { users, currentUserRole });
+});
+
+
 
 // Database setup
 //  with proper async initialization
@@ -354,36 +400,44 @@ app.get("/director/:id", (req, res) => {
 });
 
 // Ruta de búsqueda por palabras clave
-app.get('/buscar-palabras-clave', (req, res) => {
+app.get("/buscar-palabras-clave", (req, res) => {
     const keywords = req.query.keywords;
     if (!keywords) {
-        return res.status(400).send("No se proporcionaron palabras clave.");
+        return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
     }
 
-    // Aquí deberías realizar la lógica de búsqueda en tu base de datos
-    // y devolver los resultados o manejar el caso de que no haya resultados
+    const query =
+        `SELECT DISTINCT movie.movie_id, movie.title
+        FROM movie
+         LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
+        WHERE movie.title LIKE ?
+           OR keywords.keyword LIKE ?
+           OR movie_cast.character_name LIKE ?
+           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
+           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
+    `;
 
-    // Supongamos que tienes una función `buscarPorPalabrasClave`:
-    buscarPorPalabrasClave(keywords)
-        .then(resultados => {
-            if (resultados.length > 0) {
-                res.render('resultados', { resultados }); // Asegúrate de tener una vista 'resultados'
-            } else {
-                res.send("No se encontraron resultados para las palabras clave proporcionadas.");
-            }
-        })
-        .catch(error => {
-            console.error("Error en la búsqueda:", error);
-            res.status(500).send("Hubo un problema con la búsqueda.");
-        });
+    const keywordPattern = `${keywords}`;
+    
+    db.all(query, [keywordPattern], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error en la búsqueda de palabras clave.");
+        }
+        //Renderizamos la vista de resultados con las películas encontradas
+        res.render("resultados_keyword", { results: rows });
+    });
 });
 
-
+// Ruta para buscar por palabras clave
 app.get("/keyword", (req, res) => {
     res.render("search_keyword");
 });
 
-// Si `getSuggestions` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
+// Si \`getSuggestions\` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
+
 async function getSuggestions(searchTerm, db) {
     const query = `
         SELECT keyword_name
@@ -392,26 +446,22 @@ async function getSuggestions(searchTerm, db) {
         LIMIT 10;
     `;
     const keywordPattern = `%${searchTerm}%`;
-
     return new Promise((resolve, reject) => {
         db.all(query, [keywordPattern], (err, rows) => {
             if (err) {
-                reject("Error en la búsqueda de palabras clave.");
+              reject("Error en la búsqueda de palabras clave.");
             } else {
                 resolve(rows);
             }
         });
     });
 }
-
 // Ejemplo de cómo usarla en una ruta
 app.get("/api/autocomplete", async (req, res) => {
     const searchTerm = req.query.q;
-
     if (!searchTerm) {
         return res.status(400).send("Debe especificar un término de búsqueda.");
     }
-
     try {
         const suggestions = await getSuggestions(searchTerm, db);
         res.json(suggestions);
@@ -468,12 +518,12 @@ app.get("/favoritos", (req, res) => {
         return res.redirect("/login");
     }
 
-    const query = `
-        SELECT m.movie_id, m.title
-        FROM movie AS m
-        INNER JOIN user_favorites AS uf ON m.movie_id = uf.movie_id
-        WHERE uf.user_id = ?;
-    `;
+    const query = 
+    `SELECT m.movie_id, m.title
+    FROM movie AS m
+    INNER JOIN user_favorites AS uf ON m.movie_id = uf.movie_id
+    WHERE uf.user_id = ?;`
+    ;
 
     db.all(query, [userId], (err, movies) => {
         if (err) {
@@ -494,9 +544,9 @@ app.post("/favoritos/agregar", (req, res) => {
     }
 
     const query = `
-        INSERT OR IGNORE INTO user_favorites (user_id, movie_id)
-        VALUES (?, ?);
-    `;
+    INSERT OR IGNORE INTO user_favorites (user_id, movie_id)
+    VALUES (?, ?);`
+    ;
 
     db.run(query, [userId, movieId], (err) => {
         if (err) {
@@ -516,10 +566,10 @@ app.post("/favoritos/eliminar", (req, res) => {
         return res.status(400).send("Usuario o película no especificados.");
     }
 
-    const query = `
-        DELETE FROM user_favorites
-        WHERE user_id = ? AND movie_id = ?;
-    `;
+    const query =`
+    DELETE FROM user_favorites
+    WHERE user_id = ? AND movie_id = ?;`
+    ;
 
     db.run(query, [userId, movieId], (err) => {
         if (err) {
@@ -530,7 +580,81 @@ app.post("/favoritos/eliminar", (req, res) => {
     });
 });
 
-// Iniciar el servidor
+// Middleware para verificar si el usuario es admin
+const isAdmin = (req, res, next) => {
+    const userId = req.cookies.user_id;
+
+    if (!userId) {
+        return res.redirect("/login");
+    }
+
+    const checkAdminQuery = "SELECT user_role FROM user WHERE user_id = ?";
+    db.get(checkAdminQuery, [userId], (err, userRow) => {
+        if (err) {
+            return res.status(500).send("Error al verificar permisos de usuario.");
+        }
+
+        if (!userRow || userRow.user_role !== 'admin') {
+            return res.status(403).send("Acceso denegado. Solo administradores pueden acceder a esta página.");
+        }
+
+        next();
+    });
+};
+
+// Ruta para listar usuarios (solo admin)
+app.get("/admin/users", isAdmin, (req, res) => {
+    const getAllUsersQuery = 
+        `SELECT user_id, user_username, user_name, user_email, user_role 
+        FROM user
+        ORDER BY user_id;`
+
+    db.all(getAllUsersQuery, [], (error, users) => {
+        if (error) {
+            return res.status(500).send("Error al obtener la lista de usuarios.");
+        }
+        res.render("admin/users", { users });
+    });
+});
+
+// Ruta para eliminar usuario (solo admin)
+app.delete("/admin/users/:id", isAdmin, (req, res) => {
+    const userIdToDelete = req.params.id;
+    const adminId = req.cookies.user_id;
+
+    // Evitar que el admin se elimine a sí mismo
+    if (userIdToDelete === adminId) {
+        return res.status(400).json({
+            success: false,
+            message: "No puedes eliminar tu propio usuario administrador"
+        });
+    }
+
+    const deleteUserQuery = "DELETE FROM user WHERE user_id = ?";
+
+    db.run(deleteUserQuery, [userIdToDelete], function(error) {
+        if (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Error al eliminar el usuario"
+            });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Usuario eliminado correctamente"
+        });
+    });
+});
+
+
 app.listen(3009, () => {
     console.log('Servidor escuchando en el puerto 3009');
 });
