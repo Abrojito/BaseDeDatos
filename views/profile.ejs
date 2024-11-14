@@ -42,9 +42,6 @@
                                         <% } %>
                                     <% } %>
                                 </span>
-                                <span class="text-sm text-gray-500 ml-2">
-                                    (<%= new Date(item.rating_date).toLocaleDateString() %>)
-                                </span>
                             </div>
                         <% } %>
 
@@ -52,9 +49,6 @@
                             <div>
                                 <span class="font-medium">Reseña:</span>
                                 <p class="mt-1 text-gray-700"><%= item.review %></p>
-                                <span class="text-sm text-gray-500">
-                                    (<%= new Date(item.review_date).toLocaleDateString() %>)
-                                </span>
                             </div>
                         <% } %>
 
