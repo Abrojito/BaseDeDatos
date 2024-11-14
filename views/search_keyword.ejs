@@ -27,9 +27,18 @@
     let selectedIndex = -1;
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
-        window.location.href = `/buscar?q=${encodeURIComponent(input.value)}`;
+        realizarBusqueda();
     });
-    // Autocompletar: cada vez que se escribe en el input
+
+    // Función para manejar la búsqueda al hacer clic en el botón o presionar Enter
+    function realizarBusqueda() {
+        const query = input.value.trim();
+        if (query) {
+            window.location.href = `/keyword/${encodeURIComponent(query)}`;
+        }
+    }
+
+    // Llamada de autocompletar al escribir en el input
     input.addEventListener("input", () => {
         if (input.value.length === 0) {
             results.replaceChildren();  // Limpiar resultados si el input está vacío
