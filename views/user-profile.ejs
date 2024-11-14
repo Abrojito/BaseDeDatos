@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        .profile-info {
+            margin-top: 20px;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .profile-info strong {
+            color: #333;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<h1>Perfil de Usuario</h1>
+
+<div class="profile-info">
+    <p><strong>Nombre de Usuario:</strong> <%= user.user_username %></p>
+    <p><strong>Correo Electrónico:</strong> <%= user.user_email %></p>
+    <p><strong>Rol:</strong> <%= user.user_role %></p>
+</div>
+
+<!-- Botón para editar perfil -->
+<a href="/user/edit/<%= user.user_id %>" class="btn">Editar Perfil</a>
+
+<!-- Botón para eliminar cuenta -->
+<form action="/user/delete/<%= user.user_id %>" method="POST" style="display: inline;">
+    <button type="submit" class="btn" style="background-color: red;">Eliminar Cuenta</button>
+</form>
+
+</body>
+</html>
