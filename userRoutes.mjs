@@ -5,11 +5,20 @@ const { Database } = pkg;
 const router = express.Router();
 const db = new Database("./movies.db");
 
-// GET route para listar usuarios (sin restricción de rol)
-router.get('/list', (req, res) => {
+// Middleware para verificar si el usuario está logueado
+const isLoggedIn = (req, res, next) => {
+    const userId = req.cookies?.user_id;
+    if (!userId) {
+        return res.status(401).send("No estás logueado");
+    }
+    next();
+};
+
+// GET route para listar usuarios
+router.get('/list', isLoggedIn, (req, res) => {
     db.all("SELECT user_id, user_username, user_email, user_role FROM user", [], (err, users) => {
         if (err) {
-            console.error(err);
+            console.error("Error al obtener la lista de usuarios:", err);
             return res.status(500).send("Error al obtener la lista de usuarios");
         }
 
@@ -17,44 +26,43 @@ router.get('/list', (req, res) => {
         const userId = req.cookies?.user_id;
         let currentUserRole = 'user'; // Rol por defecto
 
-        // Si hay un usuario logueado, buscar su rol
         if (userId) {
             db.get("SELECT user_role FROM user WHERE user_id = ?", [userId], (err, user) => {
                 if (err) {
-                    console.error(err);
+                    console.error("Error al obtener el rol del usuario:", err);
                     return res.status(500).send("Error al obtener el rol del usuario");
                 }
                 if (user) {
                     currentUserRole = user.user_role;
                 }
-                res.render('user_list', { users, currentUserRole });
+                res.render('user-list', { users, currentUserRole });
             });
         } else {
-            res.render('user_list', { users, currentUserRole });
+            res.render('user-list', { users, currentUserRole });
         }
     });
 });
 
 // GET route para perfil de usuario
-router.get('/profile/:id', (req, res) => {
+router.get('/profile/:id', isLoggedIn, (req, res) => {
     const userId = req.params.id;
 
     db.get("SELECT user_id, user_username, user_email, user_role FROM user WHERE user_id = ?",
         [userId],
         (err, user) => {
             if (err) {
-                console.error(err);
-                return res.status(500).send("Error retrieving user profile");
+                console.error("Error al obtener el perfil del usuario:", err);
+                return res.status(500).send("Error al obtener el perfil del usuario");
             }
             if (!user) {
-                return res.status(404).send("User not found");
+                return res.status(404).send("Usuario no encontrado");
             }
             res.render('user_profile', { user });
         });
 });
 
 // POST route para actualizar perfil
-router.post('/profile/:id/update', (req, res) => {
+router.post('/profile/:id/update', isLoggedIn, (req, res) => {
     const userId = req.params.id;
     const { username, email } = req.body;
 
@@ -62,74 +70,63 @@ router.post('/profile/:id/update', (req, res) => {
         [username, email, userId],
         (err) => {
             if (err) {
-                console.error(err);
-                return res.status(500).send("Error updating user profile");
+                console.error("Error al actualizar el perfil:", err);
+                return res.status(500).send("Error al actualizar el perfil");
             }
             res.redirect(`/user/profile/${userId}`);
         });
 });
 
-// DELETE route para eliminar cuenta (solo para admin o el mismo usuario)
-router.delete('/:id', (req, res) => {
+// DELETE route para eliminar cuenta
+router.delete('/:id', isLoggedIn, (req, res) => {
     const userId = req.params.id;
 
-    // Verificar si el usuario que realiza la acción es admin
+    // Verificar si el usuario que realiza la acción es el mismo usuario
     const requestingUserId = req.cookies?.user_id;
 
-    db.get("SELECT user_role FROM user WHERE user_id = ?", [requestingUserId], (err, requestingUser) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send("Error verificando permisos");
-        }
-
-        // Solo permitir eliminar si es admin o si es el propio usuario
-        if (requestingUser?.user_role === 'admin' || requestingUserId === userId) {
-            db.run("DELETE FROM user WHERE user_id = ?",
-                [userId],
-                (err) => {
-                    if (err) {
-                        console.error(err);
-                        return res.status(500).send("Error deleting user");
-                    }
-                    res.status(200).send("User deleted successfully");
-                });
-        } else {
-            res.status(403).send("No tienes permiso para realizar esta acción");
-        }
-    });
-});
-
-// Nueva ruta GET para crear usuario (formulario) solo para admin
-router.get('/new', (req, res) => {
-    const requestingUserId = req.cookies?.user_id;
-
-    db.get("SELECT user_role FROM user WHERE user_id = ?", [requestingUserId], (err, user) => {
-        if (err || !user || user.user_role !== 'admin') {
-            return res.status(403).send("No tienes permiso para crear usuarios");
-        }
-        res.render('user_create');
-    });
-});
-
-// Nueva ruta POST para crear usuario (solo para admin)
-router.post('/new', (req, res) => {
-    const { username, email, password, role = 'user' } = req.body;
-    const requestingUserId = req.cookies?.user_id;
-
-    db.get("SELECT user_role FROM user WHERE user_id = ?", [requestingUserId], (err, user) => {
-        if (err || !user || user.user_role !== 'admin') {
-            return res.status(403).send("No tienes permiso para crear usuarios");
-        }
-
-        db.run("INSERT INTO user (user_username, user_email, user_password, user_role) VALUES (?, ?, ?, ?)",
-            [username, email, password, role],
-            function(err) {
+    if (requestingUserId === userId) {
+        db.run("DELETE FROM user WHERE user_id = ?",
+            [userId],
+            (err) => {
                 if (err) {
-                    console.error(err);
-                    return res.status(500).send("Error al crear el usuario");
+                    console.error("Error al eliminar el usuario:", err);
+                    return res.status(500).send("Error al eliminar el usuario");
                 }
-                res.redirect('/user/list');
+                res.status(200).send("Usuario eliminado correctamente");
             });
+    } else {
+        res.status(403).send("No tienes permiso para realizar esta acción");
+    }
+});
+
+// GET route para crear nuevo usuario
+router.get('/new', isLoggedIn, (req, res) => {
+    res.render('user_create');
+});
+
+// POST route para crear nuevo usuario
+router.post('/new', isLoggedIn, (req, res) => {
+    const { username, email, password, role = 'user' } = req.body;
+
+    db.run("INSERT INTO user (user_username, user_email, user_password, user_role) VALUES (?, ?, ?, ?)",
+        [username, email, password, role],
+        function(err) {
+            if (err) {
+                console.error("Error al crear el usuario:", err);
+                return res.status(500).send("Error al crear el usuario");
+            }
+            res.redirect('/user/list');
+        });
+});
+
+// Ruta para obtener todos los usuarios (sin restricciones de admin)
+router.get('/all', (req, res) => {
+    db.all("SELECT user_id, user_username, user_email, user_role FROM user", [], (err, users) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err);
+            return res.status(500).send("Error al obtener usuarios");
+        }
+        res.json(users); // Responde con los usuarios en formato JSON
     });
 });
 

@@ -1,10 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/users.css">
     <title>Usuarios</title>
+    <style>
+        /* Estilo global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        /* Botón para agregar usuario */
+        .add-user-btn {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .add-user-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Contenedor de los usuarios */
+        .user-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tarjeta de usuario */
+        .user-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        /* Botones de acción */
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Botón editar */
+        button:nth-child(1) {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        button:nth-child(1):hover {
+            background-color: #e0a800;
+        }
+
+        /* Botón eliminar */
+        button:nth-child(2) {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button:nth-child(2):hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -13,21 +122,44 @@
     <% if (currentUserRole === 'admin') { %>
         <!-- Botón de administración para agregar usuario solo visible para admins -->
         <a href="/user/add" class="add-user-btn">Agregar usuario</a>
-    <% } else { %>
-        <p>No tienes permisos para agregar usuarios.</p>
     <% } %>
 
     <div class="user-selection">
         <% users.forEach((user) => { %>
             <div class="user-card">
-                <p><%= user.username %> (<%= user.email %>)</p>
+                <p><%= user.user_username %> (<%= user.user_email %>)</p>
+
+                <!-- Los botones de editar y eliminar solo son visibles para los administradores -->
                 <% if (currentUserRole === 'admin') { %>
-                    <!-- Solo los admins ven el botón de editar -->
-                    <button onclick="location.href='/user/edit/<%= user.id %>'">Editar</button>
+                    <button onclick="location.href='/user/edit/<%= user.user_id %>'">Editar</button>
+                    <button onclick="deleteUser(<%= user.user_id %>)">Eliminar</button>
                 <% } %>
             </div>
         <% }) %>
     </div>
 </div>
+
+<script>
+    async function deleteUser(userId) {
+        if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+            try {
+                const response = await fetch(`/user/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    location.reload(); // Recarga la página para reflejar los cambios
+                } else {
+                    const errorText = await response.text();
+                    alert(errorText || 'Error al eliminar el usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el usuario');
+            }
+        }
+    }
+</script>
+
 </body>
 </html>

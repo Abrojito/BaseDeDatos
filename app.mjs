@@ -70,6 +70,7 @@ app.get("/", (req, res) => {
 });
 
 // Ruta para la lista de usuarios
+// Ruta para la lista de usuarios
 app.get('/user-list', async (req, res) => {
     try {
         const users = await getAllUsers();  // Llama a la función para obtener los usuarios
@@ -82,6 +83,8 @@ app.get('/user-list', async (req, res) => {
         res.status(500).send('Error al cargar la lista de usuarios');
     }
 });
+
+
 
 
 // Ruta para mostrar el formulario de login
