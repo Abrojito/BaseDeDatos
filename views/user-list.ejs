@@ -14,105 +14,133 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8; /* Color de fondo suave */
             color: #333;
             padding: 20px;
         }
 
         /* Contenedor principal */
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
+            font-size: 32px;
             margin-bottom: 20px;
-            color: #007bff;
+            color: #003D3A;
         }
 
         /* Botón para agregar usuario */
         .add-user-btn {
             display: block;
             margin: 0 auto 20px;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            font-size: 16px;
+            padding: 12px 24px;
+            background-color: #FDFBED;
+            color: #003D3A;
+            font-size: 18px;
+            font-weight: bold;
             text-align: center;
-            border-radius: 5px;
+            border-radius: 8px;
             text-decoration: none;
-            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .add-user-btn:hover {
-            background-color: #218838;
+            background-color: #003D3A;
+            transform: translateY(-2px);
         }
 
         /* Contenedor de los usuarios */
         .user-selection {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
 
         /* Tarjeta de usuario */
         .user-card {
-            background-color: #fff;
+            background-color: #f9fafb;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            transition: box-shadow 0.3s;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: box-shadow 0.3s ease, transform 0.2s ease;
         }
 
         .user-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transform: translateY(-4px);
         }
 
         .user-card p {
             font-size: 16px;
-            margin-bottom: 10px;
             color: #555;
+            margin-bottom: 15px;
         }
 
         /* Botones de acción */
-        button {
-            padding: 8px 16px;
+        .user-card button {
+            padding: 10px 16px;
             font-size: 14px;
+            font-weight: bold;
             border-radius: 5px;
             border: none;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s;
+            margin: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        button:hover {
-            opacity: 0.9;
+        .user-card button:hover {
+            transform: translateY(-2px);
         }
 
         /* Botón editar */
-        button:nth-child(1) {
+        .user-card button:nth-child(1) {
             background-color: #ffc107;
             color: black;
         }
 
-        button:nth-child(1):hover {
+        .user-card button:nth-child(1):hover {
             background-color: #e0a800;
         }
 
         /* Botón eliminar */
-        button:nth-child(2) {
+        .user-card button:nth-child(2) {
             background-color: #dc3545;
             color: white;
         }
 
-        button:nth-child(2):hover {
+        .user-card button:nth-child(2):hover {
             background-color: #c82333;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .add-user-btn {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+
+            .user-card p {
+                font-size: 14px;
+            }
+
+            .user-card button {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
         }
     </style>
 </head>
