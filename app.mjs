@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import profile from "./profile.mjs";
 import reviews from "./reviews.mjs";
 import userRoutes from "./userRoutes.mjs"; // Asegúrate de importar las rutas
-import { searchMovies, searchPeople } from "./search.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import { getAllUsers } from "./userService.mjs";

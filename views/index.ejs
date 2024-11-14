@@ -231,7 +231,7 @@
     <div id="results"></div>
 
     <!-- Button for 'Search by Keyword' -->
-    <button id="keyword-search-btn" class="keyword-button">
+    <button id="keyword-search-btn" class="keyword-button" onclick="onClick()"> 
         Search by keyword
     </button>
 </div>
@@ -240,5 +240,10 @@
 <div class="playlist-button">
     <button onclick="window.location.href='/favoritos'">My list</button>
 </div>
+<script>
+    function onClick() {
+        location.href = "/keyword"
+    }
+</script>
 </body>
 </html>

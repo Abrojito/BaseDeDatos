@@ -139,7 +139,7 @@
             console.log(userId);
             if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
                 try {
-                    fetch(`http://localhost:3009/user/${userId}`, {
+                    fetch(`/${userId}`, {
                         method: "DELETE",
                     }).then((response) => {
                         if (response.ok) {
