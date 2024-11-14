@@ -36,7 +36,7 @@
     function realizarBusqueda() {
         const query = input.value.trim();
         if (query) {
-            window.location.href = `/buscar-palabras-clave?keywords=${encodeURIComponent(query)}`;
+            window.location.href = `/keyword/${encodeURIComponent(query)}`;
         }
     }
 

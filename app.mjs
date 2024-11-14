@@ -421,7 +421,44 @@ app.get("/api/autocomplete", async (req, res) => {
     }
 });
 
+// Ruta para visualizar los resultados de la búsqueda por palabras clave
+app.get("/keyword/:q", (req, res) => {
+    res.status(200).render("resultados_keyword.ejs");
+});
 
+// Funcion para buscar por palabras clave
+app.get("/api/keyword", (req, res) => {
+    const { q } = req.query;
+    if (q == undefined) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const query = `SELECT * FROM movie AS m WHERE m.movie_id
+    IN (SELECT m.movie_id FROM movie AS m
+    INNER JOIN movie_keywords AS mk ON m.movie_id
+    = mk.movie_id INNER JOIN keyword AS k
+    ON mk.keyword_id = k.keyword_id WHERE k.keyword_name
+    LIKE ?);`;
+    db.all(query, [`%${q}%`], (err, rows) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        res.status(200).send(rows);
+    });
+});
+
+app.get("/api/search", async (req, res) => {
+    const { q } = req.query;
+    console.log("Searching for: ", q);
+    if (!q) {
+        res.status(400).send("Bad Request");
+        return;
+    }
+    const results = await Promise.all([searchMovies(q), searchPeople(q)]);
+    return res.send([...results[0], ...results[1]]);
+});
 
 // Ruta para ver la lista de favoritos del usuario
 app.get("/favoritos", (req, res) => {
