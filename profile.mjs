@@ -69,6 +69,13 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+
+
+
+
+
+
 // Agregar o actualizar puntuación de película
 router.post('/rating', async (req, res) => {
     const userId = req.cookies.user_id;

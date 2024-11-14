@@ -9,13 +9,86 @@ import { searchMovies, searchPeople } from "./search.js";
 const { Database } = pkg;
 const app = express();
 const port = process.env.PORT || 3009;
+app.set("view engine", "ejs");
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+app.set("views", path.join(__dirname, "views"));
 
 // Serve static files from the "views" directory
 app.use(express.static("views"));
 
+
+
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(cookieParser());
+
+// Establecer EJS como motor de plantillas
+app.set('view engine', 'ejs');   // Esto le dice a Express que use EJS como motor de plantillas
+app.set('views', path.join(__dirname, 'views')); // Carpeta donde están tus vistas
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const query = "SELECT user_id, user_username, user_email, user_role FROM user"; // Consulta para obtener todos los usuarios
+
+    db.all(query, [], (err, users) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al obtener los usuarios.");
+        }
+        const currentUserRole = 'admin'; // Esto lo puedes modificar según el rol de sesión del usuario actual
+        res.render('user_list', { users, currentUserRole });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Ruta para mostrar la lista de usuarios
+app.get('/users', (req, res) => {
+    const users = [
+        { id: 1, username: 'Juan', email: 'juan@correo.com' },
+        { id: 2, username: 'Ana', email: 'ana@correo.com' },
+    ];
+    const currentUserRole = 'admin'; // Cambia esto según el rol de tu usuario
+    res.render('user_list', { users, currentUserRole });
+});
+
+
 
 // Database setup
 //  with proper async initialization
@@ -343,62 +416,75 @@ app.get("/director/:id", (req, res) => {
     });
 });
 
-app.get("/buscar-palabras-clave", (req, res) => {
+// Ruta de búsqueda por palabras clave
+app.get('/buscar-palabras-clave', (req, res) => {
     const keywords = req.query.keywords;
-    console.log("Keywords recibidos:", keywords); // Depuración
-
     if (!keywords) {
-        return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
+        return res.status(400).send("No se proporcionaron palabras clave.");
     }
 
-    const query = `
-        SELECT DISTINCT movie.movie_id, movie.title
-        FROM movie
-                 LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-                 LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-                 LEFT JOIN movie_keywords ON movie.movie_id = movie_keywords.movie_id
-                 LEFT JOIN keyword ON movie_keywords.keyword_id = keyword.keyword_id
-        WHERE movie.title LIKE '%acción%'
-           OR keyword.keyword_name LIKE '%acción%'
-           OR movie_cast.character_name LIKE '%acción%'
-           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%')
-           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE '%acción%');
+    // Aquí deberías realizar la lógica de búsqueda en tu base de datos
+    // y devolver los resultados o manejar el caso de que no haya resultados
 
-    `;
-
-    const keywordPattern = `%${keywords}%`;
-    db.all(query, [keywordPattern, keywordPattern, keywordPattern, keywordPattern, keywordPattern], (err, rows) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send("Error en la búsqueda de palabras clave.");
-        } else {
-            res.render("resultados_keyword", { results: rows });
-        }
-    });
+    // Supongamos que tienes una función `buscarPorPalabrasClave`:
+    buscarPorPalabrasClave(keywords)
+        .then(resultados => {
+            if (resultados.length > 0) {
+                res.render('resultados', { resultados }); // Asegúrate de tener una vista 'resultados'
+            } else {
+                res.send("No se encontraron resultados para las palabras clave proporcionadas.");
+            }
+        })
+        .catch(error => {
+            console.error("Error en la búsqueda:", error);
+            res.status(500).send("Hubo un problema con la búsqueda.");
+        });
 });
 
-// Ruta para buscar por palabras clave
+
 app.get("/keyword", (req, res) => {
     res.render("search_keyword");
 });
 
-// Funcion para autocompletar la búsqueda
-app.get("/autocomplete", (req, res) => {
-    const searchTerm = req.query.term;
+// Si `getSuggestions` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
+async function getSuggestions(searchTerm, db) {
+    const query = `
+        SELECT keyword_name
+        FROM keyword
+        WHERE keyword_name LIKE ?
+        LIMIT 10;
+    `;
+    const keywordPattern = `%${searchTerm}%`;
 
-    if (searchTerm) {
-        const query = `SELECT title FROM movie WHERE title LIKE ? LIMIT 10`;
-        db.all(query, [`%${searchTerm}%`], (err, rows) => {
+    return new Promise((resolve, reject) => {
+        db.all(query, [keywordPattern], (err, rows) => {
             if (err) {
-                res.status(500).send("Error fetching autocomplete data.");
+                reject("Error en la búsqueda de palabras clave.");
             } else {
-                res.json(rows);
+                resolve(rows);
             }
         });
-    } else {
-        res.json([]);
+    });
+}
+
+// Ejemplo de cómo usarla en una ruta
+app.get("/api/autocomplete", async (req, res) => {
+    const searchTerm = req.query.q;
+
+    if (!searchTerm) {
+        return res.status(400).send("Debe especificar un término de búsqueda.");
+    }
+
+    try {
+        const suggestions = await getSuggestions(searchTerm, db);
+        res.json(suggestions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
     }
 });
+
+
 
 // Ruta para ver la lista de favoritos del usuario
 app.get("/favoritos", (req, res) => {
@@ -470,181 +556,84 @@ app.post("/favoritos/eliminar", (req, res) => {
     });
 });
 
-
-// Ruta para visualizar los resultados de la búsqueda por palabras clave
-
-
-/*
-// Ruta para el perfil del usuario - Cambiada a '/perfil'
-app.get('/perfil', async (req, res) => {
+// Middleware para verificar si el usuario es admin
+const isAdmin = (req, res, next) => {
     const userId = req.cookies.user_id;
 
     if (!userId) {
-        return res.redirect('/login');
+        return res.redirect("/login");
     }
 
-    try {
-        const db = await dbPromise;
-
-        // Obtener datos del usuario
-        const user = await db.get(`
-            SELECT * FROM users
-            WHERE user_id = ?
-        `, userId);
-
-        if (!user) {
-            res.clearCookie('user_id');
-            return res.redirect('/login');
+    const checkAdminQuery = "SELECT user_role FROM user WHERE user_id = ?";
+    db.get(checkAdminQuery, [userId], (err, userRow) => {
+        if (err) {
+            return res.status(500).send("Error al verificar permisos de usuario.");
         }
 
-        // Obtener lista de reproducción del usuario
-        const watchlist = await db.all(`
-            SELECT m.*
-            FROM movies m
-                     JOIN user_watchlist w ON m.movie_id = w.movie_id
-            WHERE w.user_id = ?
-        `, userId);
+        if (!userRow || userRow.user_role !== 'admin') {
+            return res.status(403).send("Acceso denegado. Solo administradores pueden acceder a esta página.");
+        }
 
-        // Obtener calificaciones del usuario
-        const ratings = await db.all(`
-            SELECT m.title, r.rating, r.date
-            FROM movies m
-                     JOIN user_ratings r ON m.movie_id = r.movie_id
-            WHERE r.user_id = ?
-            ORDER BY r.date DESC
-        `, userId);
+        next();
+    });
+};
 
-        // Obtener reseñas del usuario
-        const reviews = await db.all(`
-            SELECT m.title, r.review, r.date
-            FROM movies m
-                     JOIN user_reviews r ON m.movie_id = r.movie_id
-            WHERE r.user_id = ?
-            ORDER BY r.date DESC
-        `, userId);
+// Ruta para listar usuarios (solo admin)
+app.get("/admin/users", isAdmin, (req, res) => {
+    const getAllUsersQuery = `
+        SELECT user_id, user_username, user_name, user_email, user_role 
+        FROM user
+        ORDER BY user_id`;
 
-        // Renderizar la vista con todos los datos
-        res.render('perfil', {
-            user,
-            watchlist,
-            ratings,
-            reviews,
-            error: null
-        });
+    db.all(getAllUsersQuery, [], (error, users) => {
+        if (error) {
+            return res.status(500).send("Error al obtener la lista de usuarios.");
+        }
+        res.render("admin/users", { users });
+    });
+});
 
-    } catch (error) {
-        console.error('Error al cargar el perfil:', error);
-        res.status(500).render('error', {
-            message: 'Error al cargar el perfil'
+// Ruta para eliminar usuario (solo admin)
+app.delete("/admin/users/:id", isAdmin, (req, res) => {
+    const userIdToDelete = req.params.id;
+    const adminId = req.cookies.user_id;
+
+    // Evitar que el admin se elimine a sí mismo
+    if (userIdToDelete === adminId) {
+        return res.status(400).json({
+            success: false,
+            message: "No puedes eliminar tu propio usuario administrador"
         });
     }
-});
 
-// También actualiza las rutas de la API para mantener consistencia
-app.post('/api/watchlist/agregar', async (req, res) => {
-    const userId = req.cookies.user_id;
-    if (!userId) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
+    const deleteUserQuery = "DELETE FROM user WHERE user_id = ?";
 
-    try {
-        const db = await dbPromise;
-        const { movieId } = req.body;
-
-        await db.run(`
-            INSERT OR IGNORE INTO user_watchlist (user_id, movie_id)
-            VALUES (?, ?)
-        `, [userId, movieId]);
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error al agregar a watchlist:', error);
-        res.status(500).json({ error: 'Error al agregar la película' });
-    }
-});
-
-app.delete('/api/watchlist/eliminar', async (req, res) => {
-    const userId = req.cookies.user_id;
-    if (!userId) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    try {
-        const db = await dbPromise;
-        const { movieId } = req.body;
-
-        await db.run(`
-            DELETE FROM user_watchlist
-            WHERE user_id = ? AND movie_id = ?
-        `, [userId, movieId]);
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error al eliminar de watchlist:', error);
-        res.status(500).json({ error: 'Error al eliminar la película' });
-    }
-});
-/!*app.get('/profile/opinions', (req, res) => {
-    const userId = req.cookies?.user_id; // Asegúrate de que estás manejando la cookie de usuario
-
-    if (!userId) {
-        return res.redirect('/login'); // Redirige al login si no hay usuario autenticado
-    }
-
-    const query = `
-        SELECT m.title, mu.rating, mu.opinion
-        FROM movie_user mu
-        JOIN movie m ON mu.movie_id = m.movie_id
-        WHERE mu.user_id = ?;
-    `;
-
-    db.all(query, [userId], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al cargar las opiniones.');
+    db.run(deleteUserQuery, [userIdToDelete], function(error) {
+        if (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Error al eliminar el usuario"
+            });
         }
-        res.render('profile', { movieUserList: rows }); // Renderiza la vista del perfil con los gustos
+
+        if (this.changes === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Usuario eliminado correctamente"
+        });
     });
 });
-app.post('/add-opinion', (req, res) => {
-    const { userId, movieId, rating, opinion } = req.body;
 
-    const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
-    db.run(query, [userId, movieId, rating, opinion], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al agregar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});
-app.post('/edit-opinion', (req, res) => {
-    const { id, rating, opinion } = req.body;
 
-    const query = `UPDATE movie_user SET rating = ?, opinion = ? WHERE id = ?`;
-    db.run(query, [rating, opinion, id], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al modificar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});
-app.post('/delete-opinion', (req, res) => {
-    const { id } = req.body;
-
-    const query = `DELETE FROM movie_user WHERE id = ?`;
-    db.run(query, [id], function(err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error al eliminar la opinión.');
-        }
-        res.redirect('/profile/opinions');
-    });
-});*!/
-*/
 
 // Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor en ejecución en http://localhost:${port}`);
+app.listen(3009, () => {
+    console.log('Servidor escuchando en el puerto 3009');
 });
+

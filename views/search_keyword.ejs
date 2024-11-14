@@ -4,167 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieWeb</title>
-    <link rel="stylesheet" href="styles/search_keyword.css">
-    <style>
-        /* Global body and html styling */
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            position: relative;
-            width: 100%;
-        }
-
-        /* Aura background styling */
-        .aura-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.6), transparent 60%),
-            radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.6), transparent 60%),
-            radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.6), transparent 60%);
-            filter: blur(80px);
-            z-index: -1;
-        }
-
-
-        h1 {
-            color: #fff;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Search form styling */
-        .search-form {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .search-form input[type="text"] {
-            width: 90%;  /* Cambié el valor a 90% para que ocupe más espacio */
-            max-width: 800px;
-            padding: 0.7rem;
-            font-size: 1rem;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px;
-            outline: none;
-            padding-left: 15px;
-            transition: background 0.3s ease;
-        }
-
-        .search-form input[type="text"]::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-form input[type="text"]:focus {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .search-form button {
-            padding: 0.7rem 1.5rem;
-            font-size: 1rem;
-            background-color: rgba(0, 123, 255, 0.5);
-            color: #fff;
-            border: none;
-            border-radius: 25px;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .search-form button:hover {
-            background-color: rgba(0, 86, 179, 0.5);
-        }
-
-        /* Home button styling */
-        .home-button {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-        }
-
-        .home-button button {
-            padding: 0.7rem 1.5rem;
-            font-size: 1rem;
-            color: #fff;
-            background: rgba(255, 182, 193, 0.8);
-            border: none;
-            border-radius: 25px;
-            outline: none;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .home-button button:hover {
-            background: rgba(255, 182, 193, 1);
-        }
-
-        /* Results container styling */
-        #results {
-            display: none;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            max-width: 700px;
-            margin: 20px auto;
-            overflow-y: auto;
-            max-height: 300px;
-            text-align: center;
-        }
-
-        #results:not(:empty) {
-            display: block;
-        }
-
-        .result-item {
-            padding: 10px;
-            margin-bottom: 8px;
-            background-color: rgba(255, 255, 255, 0.6);
-            border-radius: 5px;
-            color: #333;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .result-item:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-2px);
-        }
-
-        .title{
-            text-align: center;
-        }
-
-        .main-content{
-            width: 50%;
-        }
-        .selected {
-            background-color: rgba(255, 255, 255, 0); /* Cambia el color de fondo */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Suaviza el cambio */
-        }
-
-    </style>
+    <link rel="stylesheet" href="/styles/search_keyword.css">
 </head>
 <body>
 <div class="aura-background"></div>
 <div class="main-content">
     <h1 class="title">MovieWeb</h1>
-    <form action="/buscar" method="GET" class="search-form" id="form">
-        <input type="text" name="q" placeholder="Search by keyword..." id="input" autocomplete="off" />
+    <form action="/buscar-palabras-clave" method="GET" class="search-form" id="form">
+        <input type="text" name="keywords" placeholder="Search by keyword..." id="input" autocomplete="off" />
         <button type="button" id="search-btn">Search</button>
     </form>
     <div id="results"></div>
@@ -172,41 +19,61 @@
         <button onclick="window.location.href = '/'">Home</button>
     </div>
 </div>
+
 <script>
     const form = document.getElementById("form");
     const input = document.getElementById("input");
     const results = document.getElementById("results");
     let selectedIndex = -1;
 
+    // Cambiar la ruta del formulario para redirigir a la página correcta
     form.addEventListener("submit", (ev) => {
         ev.preventDefault();
-        window.location.href = `keyword/${input.value}`;
+        realizarBusqueda();
     });
 
+    // Función para manejar la búsqueda al hacer clic en el botón o presionar Enter
+    function realizarBusqueda() {
+        const query = input.value.trim();
+        if (query) {
+            window.location.href = `/buscar-palabras-clave?keywords=${encodeURIComponent(query)}`;
+        }
+    }
+
+    // Llamada de autocompletar al escribir en el input
     input.addEventListener("input", () => {
         if (input.value.length === 0) {
-            setTimeout(() => results.replaceChildren(), 30);
+            results.innerHTML = "";  // Limpiar resultados si el input está vacío
             return;
         }
-        fetch(`/api/autocomplete?q=${input.value}`)
-            .then(response => response.ok ? response.json() : Promise.reject(response.statusText))
+
+        // Llamada a la API para autocompletar
+        fetch(`/api/autocomplete?q=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
             .then(result => {
-                results.replaceChildren();
-                selectedIndex = -1; // Reset selection index
+                results.innerHTML = "";  // Limpiar resultados anteriores
+                selectedIndex = -1;  // Reiniciar el índice seleccionado
                 result.forEach((keyword, index) => {
                     const div = document.createElement("div");
                     div.className = "result-item";
                     div.textContent = keyword.keyword_name;
                     div.dataset.index = index;
+
+                    // Redireccionar a la página de resultados al hacer clic en el resultado
                     div.addEventListener("click", () => {
-                        window.location.href = `/keyword/${div.textContent}`;
+                        input.value = keyword.keyword_name;
+                        realizarBusqueda();  // Ejecutar búsqueda con el valor seleccionado
                     });
+
                     results.appendChild(div);
                 });
             })
-            .catch(error => alert(error));
+            .catch(error => {
+                console.error("Error al obtener las sugerencias de búsqueda:", error);
+            });
     });
 
+    // Manejo de las teclas de flecha para navegar por el autocompletado
     input.addEventListener("keydown", (ev) => {
         const items = Array.from(results.children);
         if (ev.key === "ArrowDown") {
@@ -223,25 +90,26 @@
             updateSelection(items);
         } else if (ev.key === "Enter" && selectedIndex >= 0) {
             ev.preventDefault();
-            items[selectedIndex].click();
+            items[selectedIndex].click();  // Ejecutar clic en la sugerencia seleccionada
+        } else if (ev.key === "Enter") {
+            realizarBusqueda();  // Ejecutar búsqueda si no hay una sugerencia seleccionada
         }
     });
 
-    document.getElementById("search-btn").addEventListener("click", () => {
-        const query = input.value;
-        if (query) {
-            window.location.href = `/keyword/${query}`;
-        }
-    });
-
+    // Función para resaltar el elemento seleccionado en autocompletado
     function updateSelection(items) {
         items.forEach((item, index) => {
             item.classList.toggle("selected", index === selectedIndex);
             if (index === selectedIndex) {
-                input.value = item.textContent;
+                input.value = item.textContent;  // Actualizar el valor del input con la selección
             }
         });
     }
+
+    // Manejo del botón de búsqueda
+    document.getElementById("search-btn").addEventListener("click", () => {
+        realizarBusqueda();
+    });
 </script>
 </body>
 </html>
