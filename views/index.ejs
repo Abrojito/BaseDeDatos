@@ -49,15 +49,7 @@
         .dropdown {
             display: none;
             position: absolute;
-            /* Opción 1: usando calc() */
-            top: calc(100% - 40px);  /* Subimos 40px desde su posición original */
-
-            /* O podrías usar cualquiera de estas alternativas: */
-            /* top: calc(100% - 50px); */ /* Sube 50px */
-            /* top: 60%; */  /* Posiciona al 60% del contenedor */
-            /* top: 50%; */  /* Posiciona a la mitad del contenedor */
-            /* top: -20px; */ /* Sube 20px desde el borde inferior */
-
+            top: calc(100% - 40px);
             right: 0;
             background-color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -113,6 +105,8 @@
         .search-form {
             margin: 20px auto;
             max-width: 600px;
+            display: flex;
+            justify-content: flex-end; /* Alinea los elementos a la derecha */
         }
 
         .search-form input {
@@ -188,6 +182,12 @@
             background-color: #c82333;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+        .user-name {
+            font-size: 20px;
+            color: black; /* Cambiar el color a blanco */
+            margin-left: 15px;
+        }
+
     </style>
 </head>
 
