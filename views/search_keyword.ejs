@@ -57,7 +57,7 @@
                     div.dataset.index = index;
                     // Redireccionar a la página de resultados al hacer clic
                     div.addEventListener("click", () => {
-                        window.location.href = `/buscar?q=${encodeURIComponent(keyword.keyword_name)}`;
+                        window.location.href = `/keyword/${keyword.keyword_name}`;
                     });
                     results.appendChild(div);
                 });
@@ -98,7 +98,7 @@
     document.getElementById("search-btn").addEventListener("click", () => {
         const query = input.value;
         if (query) {
-            window.location.href = `/buscar?q=${encodeURIComponent(query)}`;
+            window.location.href = `/keyword/${query}`;
         }
     });
 </script>

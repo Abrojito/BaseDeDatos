@@ -427,6 +427,65 @@ app.get("/api/search", async (req, res) => {
     return res.send([...results[0], ...results[1]]);
 });
 
+// Ruta para ver la lista de favoritos del usuario
+app.get("/favoritos", (req, res) => {
+    const userId = req.cookies.user_id;
+    if (!userId) {
+        return res.redirect("/login");
+    }
+    const query = `
+        SELECT m.movie_id, m.title
+        FROM movie AS m
+        INNER JOIN user_favorites AS uf ON m.movie_id = uf.movie_id
+        WHERE uf.user_id = ?;
+    `;
+    db.all(query, [userId], (err, movies) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al cargar los favoritos.");
+        }
+        res.render("favoritos", { movies });
+    });
+});
+// Ruta para agregar una película a favoritos
+app.post("/favoritos/agregar", (req, res) => {
+    const userId = req.cookies.user_id;
+    const { movieId } = req.body;
+    if (!userId || !movieId) {
+        return res.status(400).send("Usuario o película no especificados.");
+    }
+    const query = `
+        INSERT OR IGNORE INTO user_favorites (user_id, movie_id)
+        VALUES (?, ?);
+    `;
+    db.run(query, [userId, movieId], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al agregar a favoritos.");
+        }
+        res.json({ success: true });
+    });
+});
+// Ruta para eliminar una película de favoritos
+app.post("/favoritos/eliminar", (req, res) => {
+    const userId = req.cookies.user_id;
+    const { movieId } = req.body;
+    if (!userId || !movieId) {
+        return res.status(400).send("Usuario o película no especificados.");
+    }
+    const query = `
+        DELETE FROM user_favorites
+        WHERE user_id = ? AND movie_id = ?;
+    `;
+    db.run(query, [userId, movieId], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error al eliminar de favoritos.");
+        }
+        res.json({ success: true });
+    });
+});
+
 // Puerto de escucha
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto ${port}`);

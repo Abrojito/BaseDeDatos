@@ -1,125 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search results</title>
-    <link rel="stylesheet" href="/styles/search_keyword.css">
-    <style>
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Background styling */
-        body, html {
-            height: 100%;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            background: radial-gradient(circle at 20% 20%, rgba(255, 82, 82, 0.3), transparent 60%),
-            radial-gradient(circle at 80% 20%, rgba(82, 82, 255, 0.3), transparent 60%),
-            radial-gradient(circle at 50% 80%, rgba(82, 255, 200, 0.3), transparent 60%);
-            overflow: hidden;
-            width: 100%;
-        }
-
-        h1 {
-            color: #fff;
-            font-size: 2rem;
-            margin: 20px 0;
-        }
-
-        /* Styling for the results list */
-        #results {
-            list-style: none;
-            width: 100%;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        #results a {
-            color: #fff;
-            font-size: 1.2rem;
-            text-decoration: none;
-            padding: 10px;
-            text-align: center;
-            transition: color 0.3s;
-        }
-
-        #results a:hover {
-            color: #FFD1DC; /* Light pink on hover */
-            text-decoration: underline;
-        }
-
-        /* Home button styling */
-        .home-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-        }
-
-        .home-button button {
-            padding: 0.7rem 1.5rem;
-            font-size: 1rem;
-            color: #fff;
-            background: rgba(255, 182, 193, 0.8);
-            border: none;
-            border-radius: 25px;
-            outline: none;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .home-button button:hover {
-            background: rgba(255, 182, 193, 1);
-        }
-    </style>
+    <title>Resultado de la Búsqueda</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
+<style>
+    .invisible {
+        display: none;
+    }
+</style>
+
 <body>
-<h1>Search results</h1>
-<ul id="results"></ul>
-<div class="home-button">
-    <button onclick="window.location.href='/'">Home</button>
-</div>
+<h1>Resultado de la Búsqueda</h1>
+<p id="paragraph" class="invisible">No hay resultados.</p>
+<ul id="results">
+</ul>
+<p></p>
+<div id="inicio"><a href="/">Inicio</a></div>
 <script>
     const results = document.getElementById("results");
-
-    // Obtiene la palabra clave del parámetro de consulta
-    const urlParams = new URLSearchParams(window.location.search);
-    const keyword = urlParams.get('q');
-
-    // Verifica que keyword no sea null
-    if (keyword) {
-        fetch(`/api/keyword?q=${keyword}`)
-            .then(response => response.ok ? response.json() : Promise.reject("Error al obtener los resultados"))
-            .then(data => {
-                if (data.length === 0) {
-                    const paragraph = document.createElement("p");
-                    paragraph.textContent = "No se encontraron resultados.";
-                    paragraph.style.color = "#fff";
-                    paragraph.style.textAlign = "center";
-                    results.append(paragraph);
-                } else {
-                    data.forEach(movie => {
-                        const anchor = document.createElement("a");
-                        anchor.href = `/pelicula/${movie.movie_id}`;
-                        anchor.textContent = movie.title;
-                        results.append(anchor);
-                    });
-                }
-            })
-            .catch(error => alert(error));
-    } else {
-        alert("Palabra clave no proporcionada en la URL.");
-    }
+    const paragraph = document.getElementById("paragraph");
+    fetch(`/api/keyword?q=${window.location.href.split("/")[4]}`).then((response) => response.ok ? response.json().then((result) => {
+        console.log(result)
+        if (result.length == 0) {
+            paragraph.className = "";
+            results.className = "invisible";
+        }
+        result.forEach((movie) => {
+            const li = document.createElement("li");
+            const anchor = document.createElement("a");
+            anchor.href = `/pelicula/${movie.movie_id}`;
+            anchor.textContent = movie.title;
+            li.append(anchor);
+            results.append(li);
+        });
+    }) : response.text().then((result) => alert(result)));
 </script>
 </body>
+
 </html>
