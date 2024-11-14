@@ -61,6 +61,23 @@ app.get('/users', (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Ruta para mostrar la lista de usuarios
 app.get('/users', (req, res) => {
     const users = [
@@ -400,68 +417,64 @@ app.get("/director/:id", (req, res) => {
 });
 
 // Ruta de búsqueda por palabras clave
-app.get("/buscar-palabras-clave", (req, res) => {
+app.get('/buscar-palabras-clave', (req, res) => {
     const keywords = req.query.keywords;
     if (!keywords) {
-        return res.status(400).send("Por favor, introduce palabras clave para realizar la búsqueda.");
+        return res.status(400).send("No se proporcionaron palabras clave.");
     }
 
-    const query =
-        SELECT DISTINCT movie.movie_id, movie.title
-        FROM movie
-         LEFT JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
-        LEFT JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-        LEFT JOIN keywords ON movie.movie_id = keywords.movie_id
-        WHERE movie.title LIKE ?
-           OR keywords.keyword LIKE ?
-           OR movie_cast.character_name LIKE ?
-           OR movie_cast.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?)
-           OR movie_crew.person_id IN (SELECT person_id FROM person WHERE person_name LIKE ?);
-    \`;
+    // Aquí deberías realizar la lógica de búsqueda en tu base de datos
+    // y devolver los resultados o manejar el caso de que no haya resultados
 
-    const keywordPattern = \`%${keywords}%\`;
-    
-    db.all(query, [keywordPattern], (err, rows) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send("Error en la búsqueda de palabras clave.");
-        }
-        //Renderizamos la vista de resultados con las películas encontradas
-        res.render("resultados_keyword", { results: rows });
-    });
+    // Supongamos que tienes una función `buscarPorPalabrasClave`:
+    buscarPorPalabrasClave(keywords)
+        .then(resultados => {
+            if (resultados.length > 0) {
+                res.render('resultados', { resultados }); // Asegúrate de tener una vista 'resultados'
+            } else {
+                res.send("No se encontraron resultados para las palabras clave proporcionadas.");
+            }
+        })
+        .catch(error => {
+            console.error("Error en la búsqueda:", error);
+            res.status(500).send("Hubo un problema con la búsqueda.");
+        });
 });
 
-// Ruta para buscar por palabras clave
+
 app.get("/keyword", (req, res) => {
     res.render("search_keyword");
 });
 
-// Si \`getSuggestions\` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
-
+// Si `getSuggestions` es para autocompletar, podrías definirla como una función que maneje el autocompletado.
 async function getSuggestions(searchTerm, db) {
-    const query = \`
+    const query = `
         SELECT keyword_name
         FROM keyword
         WHERE keyword_name LIKE ?
         LIMIT 10;
-    \`;
-    const keywordPattern = \`%${searchTerm}%\`;
+    `;
+    const keywordPattern = `%${searchTerm}%`;
+
     return new Promise((resolve, reject) => {
         db.all(query, [keywordPattern], (err, rows) => {
             if (err) {
-              reject("Error en la búsqueda de palabras clave.");
+                reject("Error en la búsqueda de palabras clave.");
             } else {
                 resolve(rows);
             }
         });
     });
 }
+
 // Ejemplo de cómo usarla en una ruta
 app.get("/api/autocomplete", async (req, res) => {
     const searchTerm = req.query.q;
+
     if (!searchTerm) {
         return res.status(400).send("Debe especificar un término de búsqueda.");
     }
+
     try {
         const suggestions = await getSuggestions(searchTerm, db);
         res.json(suggestions);
@@ -469,8 +482,10 @@ app.get("/api/autocomplete", async (req, res) => {
         console.error(error);
         res.status(500).send(error);
     }
-}); 
-   
+});
+
+
+
 // Ruta para ver la lista de favoritos del usuario
 app.get("/favoritos", (req, res) => {
     const userId = req.cookies.user_id;
@@ -479,12 +494,12 @@ app.get("/favoritos", (req, res) => {
         return res.redirect("/login");
     }
 
-    const query = 
-    SELECT m.movie_id, m.title
-    FROM movie AS m
-    INNER JOIN user_favorites AS uf ON m.movie_id = uf.movie_id
-    WHERE uf.user_id = ?;
-    ;
+    const query = `
+        SELECT m.movie_id, m.title
+        FROM movie AS m
+        INNER JOIN user_favorites AS uf ON m.movie_id = uf.movie_id
+        WHERE uf.user_id = ?;
+    `;
 
     db.all(query, [userId], (err, movies) => {
         if (err) {
@@ -504,10 +519,10 @@ app.post("/favoritos/agregar", (req, res) => {
         return res.status(400).send("Usuario o película no especificados.");
     }
 
-    const query = 
-    INSERT OR IGNORE INTO user_favorites (user_id, movie_id)
-    VALUES (?, ?);
-    ;
+    const query = `
+        INSERT OR IGNORE INTO user_favorites (user_id, movie_id)
+        VALUES (?, ?);
+    `;
 
     db.run(query, [userId, movieId], (err) => {
         if (err) {
@@ -527,10 +542,10 @@ app.post("/favoritos/eliminar", (req, res) => {
         return res.status(400).send("Usuario o película no especificados.");
     }
 
-    const query =
-    DELETE FROM user_favorites
-    WHERE user_id = ? AND movie_id = ?;
-    ;
+    const query = `
+        DELETE FROM user_favorites
+        WHERE user_id = ? AND movie_id = ?;
+    `;
 
     db.run(query, [userId, movieId], (err) => {
         if (err) {
@@ -565,10 +580,10 @@ const isAdmin = (req, res, next) => {
 
 // Ruta para listar usuarios (solo admin)
 app.get("/admin/users", isAdmin, (req, res) => {
-    const getAllUsersQuery = 
+    const getAllUsersQuery = `
         SELECT user_id, user_username, user_name, user_email, user_role 
         FROM user
-        ORDER BY user_id;
+        ORDER BY user_id`;
 
     db.all(getAllUsersQuery, [], (error, users) => {
         if (error) {
@@ -616,6 +631,9 @@ app.delete("/admin/users/:id", isAdmin, (req, res) => {
 });
 
 
-app.listen(3009, () => {
-    console.log('Servidor escuchando en el puerto 3009');
+
+// Iniciar el servidor
+// Iniciar el servidor
+app.listen(port, () => {
+    console.log(`Servidor en ejecución en http://localhost:${port}`);
 });
