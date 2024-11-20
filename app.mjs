@@ -29,13 +29,13 @@ app.use(cookieParser());
 
 app.use("/user", user);
 
-// Configurar express-session para manejar sesiones de usuario
+
 app.use(
     session({
-        secret: "tu-secreto", // Secreto para firmar las sesiones
+        secret: "tu-secreto",
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: false }, // Usa secure: true en producción con HTTPS
+        cookie: { secure: false },
     })
 );
 
@@ -111,7 +111,7 @@ app.get("/", (req, res) => {
 app.get("/user-list", async (req, res) => {
     try {
         const users = await getAllUsers(); // Llama a la función para obtener los usuarios
-        const currentUserRole = req.session.user_role; // Obtén el rol del usuario actual desde la sesión
+        const currentUserRole = req.session.user_role;
 
         // Ahora la verificación de rol se elimina, cualquier usuario puede ver la lista de usuarios
         res.render("user-list", { users, currentUserRole }); // Pasa los datos a la vista
@@ -139,10 +139,10 @@ app.post("/login", (req, res) => {
         }
         if (row) {
             // Guardar el rol en la sesión
-            req.session.user_role = row.user_role; // Asumiendo que 'user_role' está en la base de datos
+            req.session.user_role = row.user_role;
 
             res.cookie("user_id", row.user_id);
-            res.redirect("/"); // Redirigir al home o donde quieras
+            res.redirect("/");
         } else {
             res.status(401).send("Usuario o contraseña incorrectos.");
         }
