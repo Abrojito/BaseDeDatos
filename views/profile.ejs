@@ -1,114 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Películas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100">
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Mi Perfil</h1>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">Mi Perfil</h1>
 
-    <!-- Información del usuario -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Información Personal</h2>
-        <!-- Asegúrate de que 'user.username' y 'user.email' sean correctos -->
-        <p><strong>Usuario:</strong> <%= user.user_username %></p> <!-- Nombre de usuario -->
-        <p><strong>Email:</strong> <%= user.user_email %></p> <!-- Correo electrónico -->
-    </div>
+        <!-- Información del usuario -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Información Personal</h2>
+            <!-- Asegúrate de que 'user.username' y 'user.email' sean correctos -->
+            <p><strong>Usuario:</strong>
+                <%= user.user_username %>
+            </p> <!-- Nombre de usuario -->
+            <p><strong>Email:</strong>
+                <%= user.user_email %>
+            </p> <!-- Correo electrónico -->
+        </div>
 
-    <!-- Películas calificadas y reseñadas -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold mb-4">Mis Películas</h2>
+        <!-- Películas calificadas y reseñadas -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Mis Películas</h2>
 
-        <% if (ratingsAndReviews.length === 0) { %>
-            <p class="text-gray-500">Aún no has calificado ni reseñado ninguna película.</p>
-        <% } else { %>
-            <div class="space-y-6">
-                <% ratingsAndReviews.forEach(item => { %>
-                    <div class="border-b pb-4">
-                        <h3 class="font-semibold text-lg mb-2"><%= item.title %></h3>
+            <% if (reviews.length===0) { %>
+                <p class="text-gray-500">Aún no has calificado ni reseñado ninguna película.</p>
+                <% } else { %>
+                    <div class="space-y-6">
+                        <% reviews.forEach(item=> { %>
+                            <div class="border-b pb-4">
+                                <h3 class="font-semibold text-lg mb-2">
+                                    <%= item.title %>
+                                </h3>
 
-                        <% if (item.rating) { %>
-                            <div class="mb-2">
-                                <span class="font-medium">Puntuación:</span>
-                                <span class="ml-2">
-                                    <% for (let i = 0; i < 5; i++) { %>
-                                        <% if (i < item.rating) { %>
-                                            ⭐
-                                        <% } else { %>
-                                            ☆
-                                        <% } %>
+                                <% if (item.rating) { %>
+                                    <div class="mb-2">
+                                        <span class="font-medium">Puntuación:</span>
+                                        <span class="ml-2">
+                                            <% for (let i=0; i < 5; i++) { %>
+                                                <% if (i < item.rating) { %>
+                                                    ⭐
+                                                    <% } else { %>
+                                                        ☆
+                                                        <% } %>
+                                                            <% } %>
+                                        </span>
+                                    </div>
                                     <% } %>
-                                </span>
-                            </div>
-                        <% } %>
 
-                        <% if (item.review) { %>
-                            <div>
-                                <span class="font-medium">Reseña:</span>
-                                <p class="mt-1 text-gray-700"><%= item.review %></p>
-                            </div>
-                        <% } %>
+                                        <% if (item.review) { %>
+                                            <div>
+                                                <span class="font-medium">Reseña:</span>
+                                                <p class="mt-1 text-gray-700">
+                                                    <%= item.review %>
+                                                </p>
+                                            </div>
+                                            <% } %>
 
-                        <div class="mt-2 space-x-2">
-                            <button onclick="editRating('<%= item.movie_id %>')" class="text-blue-600 text-sm hover:text-blue-800">
-                                Editar puntuación
-                            </button>
-                            <button onclick="editReview('<%= item.movie_id %>')" class="text-blue-600 text-sm hover:text-blue-800">
-                                Editar reseña
-                            </button>
-                        </div>
+                                                <div class="mt-2 space-x-2">
+                                                    <button onclick="editRating('<%= item.id %>')"
+                                                        class="text-blue-600 text-sm hover:text-blue-800">
+                                                        Editar puntuación
+                                                    </button>
+                                                    <button onclick="editReview('<%= item.id %>')"
+                                                        class="text-blue-600 text-sm hover:text-blue-800">
+                                                        Editar reseña
+                                                    </button>
+                                                </div>
+                            </div>
+                            <% }) %>
                     </div>
-                <% }) %>
-            </div>
-        <% } %>
+                    <% } %>
+        </div>
     </div>
-</div>
 
-<script>
-    function editRating(movieId) {
-        const newRating = prompt('Ingresa una nueva puntuación (1-5):');
-        if (newRating && !isNaN(newRating) && newRating >= 1 && newRating <= 5) {
-            fetch('/perfil/rating', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ movieId, rating: Number(newRating) })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error al actualizar la puntuación');
-                    }
-                });
+    <script>
+        function editRating(reviewId) {
+            const newRating = prompt('Ingresa una nueva puntuación (1-5):');
+            if (newRating && !isNaN(newRating) && newRating >= 1 && newRating <= 5) {
+                fetch('/perfil/rating', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ rating: Number(newRating), reviewId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al actualizar la puntuación');
+                        }
+                    });
+            }
         }
-    }
 
-    function editReview(movieId) {
-        const newReview = prompt('Ingresa tu nueva reseña:');
-        if (newReview && newReview.trim()) {
-            fetch('/perfil/review', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ movieId, review: newReview.trim() })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error al actualizar la reseña');
-                    }
-                });
+        function editReview(reviewId) {
+            const newReview = prompt('Ingresa tu nueva reseña:');
+            if (newReview && newReview.trim()) {
+                fetch('/perfil/review', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ review: newReview.trim(), reviewId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al actualizar la reseña');
+                        }
+                    });
+            }
         }
-    }
-</script>
+    </script>
 </body>
+
 </html>

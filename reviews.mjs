@@ -8,7 +8,7 @@ const router = express.Router();
 // Función helper para convertir db.run en una promesa
 const runQuery = (query, params) => {
     return new Promise((resolve, reject) => {
-        db.run(query, params, function(err) {
+        db.run(query, params, function (err) {
             if (err) {
                 reject(err);
             } else {
@@ -22,7 +22,7 @@ const runQuery = (query, params) => {
 router.post('/:movieId/review', async (req, res) => {
     const { movieId } = req.params;
     let { rating, opinion } = req.body;
-    let { user_id} = req.cookies;
+    let { user_id } = req.cookies;
 
     console.log('Cuerpo de la solicitud:', req.body);
     console.log('Movie ID:', movieId);
@@ -34,7 +34,7 @@ router.post('/:movieId/review', async (req, res) => {
 
 
     try {
-        const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
+        const query = `INSERT INTO movie_user (id, user_id, movie_id, rating, review) VALUES (NULL, ?, ?, ?, ?)`;
         const values = [user_id, movieId, rating, opinion];
 
         const result = await runQuery(query, values);
@@ -65,22 +65,8 @@ router.get('/movies/:id', async (req, res) => {
     res.render('pelicula', { movie, userId }); // Pasa userId aquí
 });
 
-router.post('/movies/:id/review', async (req, res) => {
-    const { userId, rating, opinion } = req.body; // Extrae los datos del cuerpo de la solicitud
-    const movieId = req.params.id; // Obtiene el ID de la película de los parámetros
-
-    try {
-        // Llama a tu función para agregar la reseña
-        await addReview(userId, movieId, rating, opinion);
-        res.status(200).json({ message: 'Reseña agregada con éxito' });
-    } catch (error) {
-        console.error('Error al agregar la reseña:', error);
-        res.status(500).json({ message: 'Error al agregar la reseña' });
-    }
-});
-
 export async function addReview(userId, movieId, rating, opinion) {
-    const sql = 'INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)';
+    const sql = 'INSERT INTO movie_user (id, user_id, movie_id, rating, review) VALUES (NULL, ?, ?, ?, ?)';
     const params = [userId, movieId, rating, opinion];
 
     // Ejecuta la consulta SQL

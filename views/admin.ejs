@@ -135,8 +135,6 @@
 
     <script>
         async function deleteUser(userId) {
-            console.log("here");
-            console.log(userId);
             if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
                 try {
                     fetch(`/${userId}`, {

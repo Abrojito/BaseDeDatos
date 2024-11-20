@@ -66,7 +66,6 @@ app.get("/user-list", (req, res) => {
             // Si es el admin, obtenemos la lista de usuarios
             getAllUsers()
                 .then((users) => {
-                    console.log(users);
                     res.render("admin", { users });
                 })
                 .catch((error) => {
@@ -438,7 +437,6 @@ app.get("/api/autocomplete", (req, res) => {
     WHERE k.keyword_name LIKE ? ORDER BY k.keyword_name LIMIT 10;`;
     db.all(query, [`%${q}%`], (err, rows) => {
         if (err) {
-            console.log(err);
             res.status(500).send("Internal Server Error");
             return;
         }
