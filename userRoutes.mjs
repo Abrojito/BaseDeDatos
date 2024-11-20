@@ -57,7 +57,7 @@ router.get('/profile/:id', isLoggedIn, (req, res) => {
             if (!user) {
                 return res.status(404).send("Usuario no encontrado");
             }
-            res.render('user_profile', { user });
+            res.render('user-profile', { user });
         });
 });
 

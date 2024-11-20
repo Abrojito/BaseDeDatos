@@ -8,14 +8,17 @@
 </head>
 <body class="bg-gray-100">
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Mi Perfil</h1>
+    <!-- Barra de navegación -->
+    <nav class="flex justify-between items-center bg-white shadow-md p-4 rounded-lg mb-8">
+        <h1 class="text-2xl font-bold">Mi Perfil</h1>
+        <a href="/" class="text-blue-600 hover:text-blue-800 font-medium">Inicio</a>
+    </nav>
 
     <!-- Información del usuario -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Información Personal</h2>
-        <!-- Asegúrate de que 'user.username' y 'user.email' sean correctos -->
-        <p><strong>Usuario:</strong> <%= user.user_username %></p> <!-- Nombre de usuario -->
-        <p><strong>Email:</strong> <%= user.user_email %></p> <!-- Correo electrónico -->
+        <p><strong>Usuario:</strong> <%= user.user_username %></p>
+        <p><strong>Email:</strong> <%= user.user_email %></p>
     </div>
 
     <!-- Películas calificadas y reseñadas -->
@@ -93,7 +96,7 @@
         const newReview = prompt('Ingresa tu nueva reseña:');
         if (newReview && newReview.trim()) {
             fetch('/perfil/review', {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },

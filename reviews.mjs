@@ -27,11 +27,28 @@ router.post('/:movieId/review', async (req, res) => {
     console.log('Cuerpo de la solicitud:', req.body);
     console.log('Movie ID:', movieId);
 
+    /*if (!userId || !rating || !opinion) {
+        return res.status(400).json({
+            message: 'Todos los campos son requeridos.',
+            details: {
+                userId: !userId ? 'requerido' : 'válido',
+                rating: !rating ? 'requerido' : 'válido',
+                opinion: !opinion ? 'requerido' : 'válido'
+            }
+        });
+    }*/
+
 
     // Convertir `userId` y `rating` a números
     user_id = parseInt(user_id, 10);
     rating = parseInt(rating, 10);
 
+    /*  // Validar `userId` y `rating`
+      if (isNaN(userId) || isNaN(rating) || rating < 1 || rating > 5) {
+          return res.status(400).json({
+              message: 'ID de usuario debe ser un número y rating debe ser un número entre 1 y 5.'
+          });
+      }*/
 
     try {
         const query = `INSERT INTO movie_user (user_id, movie_id, rating, opinion) VALUES (?, ?, ?, ?)`;
