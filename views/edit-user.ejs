@@ -35,7 +35,7 @@
         const name = document.getElementById("name")
         const email = document.getElementById("email")
         const urlParams = new URLSearchParams(window.location.search)
-        const id = urlParams.get("id")
+        const id = location.href.split("/")[5]
         const deleteBtn = document.getElementById("delete-btn")
 
         window.onload = function () {
@@ -52,6 +52,8 @@
                 name: name.value,
                 email: email.value,
             }
+            console.log(body)
+            console.log(id)
 
             fetch(`/user/${id}`, {
                 method: "PUT",

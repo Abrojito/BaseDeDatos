@@ -15,7 +15,8 @@
 
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8; /* Color de fondo suave */
+            background-color: #f0f4f8;
+            /* Color de fondo suave */
             color: #333;
             padding: 20px;
         }
@@ -164,7 +165,7 @@
                             <!-- Los botones de editar y eliminar solo son visibles para los administradores -->
                             <% if (currentUserRole==='admin' ) { %>
                                 <button onclick="location.href='/user/edit/<%= user.user_id %>'">Editar</button>
-                                <button onclick="deleteUser(<%= user.user_id %>)">Eliminar</button>
+                                <button onclick="deleteUser('<%= user.user_id %>')">Eliminar</button>
                                 <% } %>
                         </div>
                         <% }) %>
@@ -174,21 +175,18 @@
     <script>
         async function deleteUser(userId) {
             if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-                try {
-                    const response = await fetch(`http://localhost:3009/user/${userId}`, {
-                        method: 'DELETE'
-                    });
+                console.log(userId)
+                fetch(`/user/${userId}`, { method: "DELETE" })
+                    .then((response) => {
+                        if (response.ok) {
+                            location.reload(); // Recarga la página para reflejar los cambios
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('Error al eliminar el usuario');
+                    })
 
-                    if (response.ok) {
-                        location.reload(); // Recarga la página para reflejar los cambios
-                    } else {
-                        const errorText = await response.text();
-                        alert(errorText || 'Error al eliminar el usuario');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error al eliminar el usuario');
-                }
             }
         }
     </script>

@@ -19,8 +19,12 @@ user.get("/add", (_, res) => {
     res.render("add-user");
 });
 
-user.get("/edit", (_, res) => {
-    res.render("edit-user");
+user.get("/edit/:id", (req, res) => {
+    const { id } = req.params
+    db.get("SELECT * FROM user WHERE user_id = ?", [id], (err, rows) => {
+        if (err) throw err;
+        res.render("edit-user", { user: rows })
+    })
 });
 
 // Mostrar formulario de login
@@ -30,10 +34,10 @@ user.get("/login", (_, res) => {
 
 // Obtener lista de películas que le gustan al usuario
 user.get("/profile", async (req, res) => {
-    const userId = req.session.user_id; // Asegúrate de que esto esté guardado en la sesión
+    const userId = req.session.user_id;
 
     try {
-        const movieUserList = await getMovieUserList(userId); // Aquí es donde se obtiene la lista
+        const movieUserList = await getMovieUserList(userId);
         const userQuery = "SELECT * FROM user WHERE user_id = ?";
 
         db.get(userQuery, [userId], (err, user) => {
@@ -41,8 +45,7 @@ user.get("/profile", async (req, res) => {
                 return res.status(500).send(err.message);
             }
 
-            // Renderizar la vista del perfil, pasando el usuario y la lista de películas
-            res.render("profile", { user, movieUserList }); // Asegúrate de que movieUserList se pase aquí
+            res.render("profile", { user, movieUserList });
         });
     } catch (error) {
         return res.status(500).send(error.message);
@@ -83,10 +86,12 @@ user.post("/register", (req, res) => {
 
 // Ruta para eliminar usuario (solo admin)
 user.delete("/:id", (req, res) => {
+    console.log("HOLA")
     const userId = req.cookies?.user_id;
     if (!userId) {
         return res.redirect("/login");
     }
+    console.log("HOLA2")
 
     // Consulta para obtener el email del usuario actual
     const query = "SELECT * FROM user WHERE user_id = ?";
@@ -99,10 +104,12 @@ user.delete("/:id", (req, res) => {
             // Si el usuario no existe, redirige al login
             return res.redirect("/login");
         }
+        console.log("HOLA3")
 
-        if (userData.user_email === "violeta@gmail.com") {
+        if (userData.user_email === "violeta@hotmail.com") {
             // Si es el admin, procede a eliminar el usuario
             const { id } = req.params;
+            console.log(id)
             const deleteQuery = "DELETE FROM user WHERE user_id = ?";
             db.run(deleteQuery, [id], (error) => {
                 if (error) {
@@ -151,18 +158,6 @@ user.put("/:id", (req, res) => {
             return res.status(500).send(error.message);
         }
         res.status(200).send(`El usuario ${username} ha sido actualizado`);
-    });
-});
-
-// Borrar usuario
-user.delete("/:id", (req, res) => {
-    const { id } = req.params;
-    const query = "DELETE FROM user WHERE user_id = ?";
-    db.run(query, [id], (error) => {
-        if (error) {
-            return res.status(500).send(error.message);
-        }
-        res.status(200).send(`El usuario con id ${id} ha sido borrado`);
     });
 });
 

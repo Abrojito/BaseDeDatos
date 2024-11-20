@@ -77,28 +77,6 @@ router.post('/profile/:id/update', isLoggedIn, (req, res) => {
         });
 });
 
-// DELETE route para eliminar cuenta
-router.delete('/:id', isLoggedIn, (req, res) => {
-    const userId = req.params.id;
-
-    // Verificar si el usuario que realiza la acción es el mismo usuario
-    const requestingUserId = req.cookies?.user_id;
-
-    if (requestingUserId === userId) {
-        db.run("DELETE FROM user WHERE user_id = ?",
-            [userId],
-            (err) => {
-                if (err) {
-                    console.error("Error al eliminar el usuario:", err);
-                    return res.status(500).send("Error al eliminar el usuario");
-                }
-                res.status(200).send("Usuario eliminado correctamente");
-            });
-    } else {
-        res.status(403).send("No tienes permiso para realizar esta acción");
-    }
-});
-
 // GET route para crear nuevo usuario
 router.get('/new', isLoggedIn, (req, res) => {
     res.render('user_create');
@@ -110,7 +88,7 @@ router.post('/new', isLoggedIn, (req, res) => {
 
     db.run("INSERT INTO user (user_username, user_email, user_password, user_role) VALUES (?, ?, ?, ?)",
         [username, email, password, role],
-        function(err) {
+        function (err) {
             if (err) {
                 console.error("Error al crear el usuario:", err);
                 return res.status(500).send("Error al crear el usuario");
