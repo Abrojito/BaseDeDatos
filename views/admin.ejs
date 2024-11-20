@@ -137,17 +137,16 @@
         async function deleteUser(userId) {
             if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
                 try {
-                    fetch(`/${userId}`, {
+                    const response = await fetch(`/user/delete/${userId}`, {
                         method: "DELETE",
-                    }).then((response) => {
-                        if (response.ok) {
-                            location.reload(); // Recarga la página para reflejar los cambios
-                        } else {
-                            response.text().then((errorText) => {
-                                alert(errorText || "Error al eliminar el usuario");
-                            });
-                        }
                     });
+
+                    if (response.ok) {
+                        location.reload(); // Recarga la página para reflejar los cambios
+                    } else {
+                        const errorText = await response.text();
+                        alert(errorText || "Error al eliminar el usuario");
+                    }
                 } catch (error) {
                     console.error("Error:", error);
                     alert("Error al eliminar el usuario");
